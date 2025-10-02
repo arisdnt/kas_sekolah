@@ -13,48 +13,47 @@ function formatDate(dateStr) {
 
 export function InfoSiswaSection({ siswa }) {
   return (
-    <div className="bg-white border-l-4 border-blue-600 shadow-sm">
-      <div className="p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <User className="h-5 w-5 text-blue-600" />
-          <Text size="4" weight="bold" className="text-slate-800 uppercase tracking-wide">
+    <div className="border-2 border-slate-300 bg-white shadow-lg">
+      <div className="border-b-2 border-slate-300 bg-gradient-to-b from-slate-100 to-slate-50 px-4 py-2">
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-blue-600" />
+          <Text size="2" weight="bold" className="text-slate-800 uppercase tracking-wider">
             Informasi Siswa
           </Text>
         </div>
+      </div>
 
-        <div className="grid grid-cols-4 gap-x-6 gap-y-4">
-          <div className="col-span-2">
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-1 block">Nama Lengkap</Text>
-            <Text size="3" weight="bold" className="text-slate-900">{siswa.nama_lengkap}</Text>
-          </div>
-
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-1 block">NISN</Text>
-            <Text size="2" className="text-slate-900 font-mono">{siswa.nisn || '-'}</Text>
-          </div>
-
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-1 block">Jenis Kelamin</Text>
-            <Text size="2" className="text-slate-900">
-              {siswa.jenis_kelamin === 'L' ? 'Laki-laki' : siswa.jenis_kelamin === 'P' ? 'Perempuan' : '-'}
-            </Text>
-          </div>
-
-          <div className="col-span-2">
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-1 block">Alamat</Text>
-            <Text size="2" className="text-slate-900">{siswa.alamat || '-'}</Text>
-          </div>
-
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-1 block">Tanggal Lahir</Text>
-            <Text size="2" className="text-slate-900">{formatDate(siswa.tanggal_lahir)}</Text>
-          </div>
-
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-1 block">No. WA Wali</Text>
-            <Text size="2" className="text-slate-900 font-mono">{siswa.nomor_whatsapp_wali || '-'}</Text>
-          </div>
-        </div>
+      <div className="p-4">
+        <table className="w-full text-sm">
+          <tbody>
+            <tr className="border-b border-slate-200">
+              <td className="py-2 pr-4 text-slate-600 font-medium w-40">Nama Lengkap</td>
+              <td className="py-2 text-slate-900 font-bold">{siswa.nama_lengkap}</td>
+            </tr>
+            <tr className="border-b border-slate-200">
+              <td className="py-2 pr-4 text-slate-600 font-medium">NISN</td>
+              <td className="py-2 text-slate-900 font-mono">{siswa.nisn || '-'}</td>
+            </tr>
+            <tr className="border-b border-slate-200">
+              <td className="py-2 pr-4 text-slate-600 font-medium">Jenis Kelamin</td>
+              <td className="py-2 text-slate-900">
+                {siswa.jenis_kelamin === 'L' ? 'Laki-laki' : siswa.jenis_kelamin === 'P' ? 'Perempuan' : '-'}
+              </td>
+            </tr>
+            <tr className="border-b border-slate-200">
+              <td className="py-2 pr-4 text-slate-600 font-medium">Tanggal Lahir</td>
+              <td className="py-2 text-slate-900">{formatDate(siswa.tanggal_lahir)}</td>
+            </tr>
+            <tr className="border-b border-slate-200">
+              <td className="py-2 pr-4 text-slate-600 font-medium">Alamat</td>
+              <td className="py-2 text-slate-900">{siswa.alamat || '-'}</td>
+            </tr>
+            <tr>
+              <td className="py-2 pr-4 text-slate-600 font-medium">No. WhatsApp Wali</td>
+              <td className="py-2 text-slate-900 font-mono">{siswa.nomor_whatsapp_wali || '-'}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   )
