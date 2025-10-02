@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Dialog, TextField, Text, Button, Select, TextArea } from '@radix-ui/themes'
-import { AlertCircle, DollarSign, Calendar, CreditCard, Hash, FileText, X, Plus, Edit3 } from 'lucide-react'
+import { Dialog, TextField, Text, Button, Select, TextArea, IconButton } from '@radix-ui/themes'
+import { AlertCircle, DollarSign, Calendar, CreditCard, Hash, FileText, X, Plus, Edit3, Wand2 } from 'lucide-react'
 
 export function TransaksiPembayaranModal({ 
   open, 
@@ -21,6 +21,14 @@ export function TransaksiPembayaranModal({
     }
   )
   const [error, setError] = useState('')
+
+  // Generate nomor transaksi otomatis
+  const generateNomorTransaksi = () => {
+    const timestamp = Date.now().toString().slice(-6)
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+    const nomorTransaksi = `TRX-${timestamp}${random}`
+    setFormData({ ...formData, nomor_transaksi: nomorTransaksi })
+  }
 
   // Update form when initialData changes
   useEffect(() => {
@@ -123,13 +131,27 @@ export function TransaksiPembayaranModal({
                   <Hash className="h-3.5 w-3.5 text-blue-500" />
                   <Text size="2" weight="medium">Nomor Transaksi <span className="text-red-600">*</span></Text>
                 </div>
-                <TextField.Root
-                  placeholder="Contoh: TRX-001"
-                  value={formData.nomor_transaksi}
-                  onChange={(e) => setFormData({ ...formData, nomor_transaksi: e.target.value })}
-                  style={{ borderRadius: 0 }}
-                  required
-                />
+                <div className="flex items-center gap-2">
+                  <TextField.Root
+                    placeholder="Contoh: TRX-001"
+                    value={formData.nomor_transaksi}
+                    onChange={(e) => setFormData({ ...formData, nomor_transaksi: e.target.value })}
+                    style={{ borderRadius: 0, flex: 1 }}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    onClick={generateNomorTransaksi}
+                    variant="soft"
+                    color="blue"
+                    style={{ borderRadius: 0 }}
+                    className="cursor-pointer shrink-0"
+                    title="Generate nomor transaksi otomatis"
+                  >
+                    <Wand2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+                <Text size="1" className="text-slate-500 mt-1">Klik tombol untuk generate otomatis</Text>
               </label>
 
               <label>

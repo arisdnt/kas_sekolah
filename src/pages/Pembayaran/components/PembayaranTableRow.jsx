@@ -1,7 +1,15 @@
 import { Text } from '@radix-ui/themes'
 import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
-import { Clock, Eye } from 'lucide-react'
+import { Clock, Eye, DollarSign } from 'lucide-react'
 import { formatDateTime } from '../utils/dateHelpers'
+
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  }).format(amount || 0)
+}
 
 export function PembayaranTableRow({ item, isSelected, onSelect, onEdit, onDelete, onViewDetail }) {
   return (
@@ -20,12 +28,12 @@ export function PembayaranTableRow({ item, isSelected, onSelect, onEdit, onDelet
       </td>
       <td className="px-6 py-4 align-middle">
         <div className="flex flex-col gap-0.5">
-          <Text size="2" weight="medium" className="text-slate-900 font-mono">
-            {item.tagihan?.nomor_tagihan || '—'}
+          <Text size="2" weight="medium" className="text-slate-900 line-clamp-1">
+            {item.tagihan?.judul || '—'}
           </Text>
-          {item.tagihan?.judul && (
-            <Text size="1" className="text-slate-500 line-clamp-1">
-              {item.tagihan.judul}
+          {item.tagihan?.nomor_tagihan && (
+            <Text size="1" className="text-slate-500 font-mono">
+              {item.tagihan.nomor_tagihan}
             </Text>
           )}
         </div>
@@ -52,6 +60,14 @@ export function PembayaranTableRow({ item, isSelected, onSelect, onEdit, onDelet
           <Clock className="h-4 w-4 text-slate-400" />
           <Text size="1">
             {formatDateTime(item.tanggal_dibuat)}
+          </Text>
+        </div>
+      </td>
+      <td className="px-6 py-4 align-middle">
+        <div className="flex items-center gap-2">
+          <DollarSign className="h-4 w-4 text-green-600" />
+          <Text size="2" weight="bold" className="text-green-700 font-mono">
+            {formatCurrency(item.total_dibayar)}
           </Text>
         </div>
       </td>

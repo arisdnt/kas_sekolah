@@ -46,17 +46,19 @@ function CreateTagihanContent() {
         `)
         .eq('status_aktif', true)
 
-      let filterTahunAjaran = null
+      // Always use selectedTahunAjaran and selectedTingkat from dropdown
+      // For 'siswa' target, user must select tahun ajaran first to filter siswa list
+      let filterTahunAjaran = selectedTahunAjaran || null
       let filterTingkat = null
 
       if (targetType === 'siswa' && formData.id_riwayat_kelas_siswa) {
+        // For selected siswa, get tingkat to filter jenis pembayaran
         const selectedSiswa = riwayatKelasSiswaList?.find(s => s.id === formData.id_riwayat_kelas_siswa)
         if (selectedSiswa) {
-          filterTahunAjaran = selectedSiswa.tahun_ajaran?.id
           filterTingkat = selectedSiswa.kelas?.tingkat
         }
-      } else if (targetType !== 'siswa') {
-        filterTahunAjaran = selectedTahunAjaran
+      } else {
+        // For kelas/tingkat/semua, use selected tingkat
         filterTingkat = selectedTingkat
       }
 

@@ -49,7 +49,7 @@ export function RincianPembayaranTable({
   nextCicilanKe 
 }) {
   return (
-    <div className="border border-slate-300 overflow-auto">
+    <div className="overflow-auto">
       <table className="w-full border-collapse text-sm">
         <thead className="bg-gradient-to-b from-slate-100 to-slate-50 sticky top-0 z-10">
           <tr className="border-b-2 border-slate-300">

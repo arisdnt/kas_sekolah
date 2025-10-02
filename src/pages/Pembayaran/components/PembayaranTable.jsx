@@ -31,12 +31,13 @@ export function PembayaranTable({ data, isLoading, isRefreshing, onEdit, onDelet
           <div className="h-full overflow-auto">
             <table className="min-w-full table-fixed text-sm">
               <colgroup>{[
-                <col key="col-1" style={{ width: '15%' }} />,
-                <col key="col-2" style={{ width: '15%' }} />,
-                <col key="col-3" style={{ width: '20%' }} />,
-                <col key="col-4" style={{ width: '25%' }} />,
-                <col key="col-5" style={{ width: '15%' }} />,
-                <col key="col-6" style={{ width: '10%' }} />,
+                <col key="col-1" style={{ width: '12%' }} />,
+                <col key="col-2" style={{ width: '18%' }} />,
+                <col key="col-3" style={{ width: '15%' }} />,
+                <col key="col-4" style={{ width: '18%' }} />,
+                <col key="col-5" style={{ width: '12%' }} />,
+                <col key="col-6" style={{ width: '12%' }} />,
+                <col key="col-7" style={{ width: '13%' }} />,
               ]}</colgroup>
               <thead>
                 <tr className="bg-white/95 backdrop-blur sticky top-0 z-10 border-b border-slate-200">
@@ -44,7 +45,7 @@ export function PembayaranTable({ data, isLoading, isRefreshing, onEdit, onDelet
                     No. Pembayaran
                   </th>
                   <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                    No. Tagihan
+                    Nama Tagihan
                   </th>
                   <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
                     Siswa
@@ -54,6 +55,9 @@ export function PembayaranTable({ data, isLoading, isRefreshing, onEdit, onDelet
                   </th>
                   <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
                     Dibuat
+                  </th>
+                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    Nominal
                   </th>
                   <th className="px-6 py-3 text-right text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
                     Aksi

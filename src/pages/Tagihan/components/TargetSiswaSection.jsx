@@ -31,24 +31,24 @@ export function TargetSiswaSection({
 
       <div className="p-4">
         <div className="grid grid-cols-2 gap-4">
-          {targetType !== 'siswa' && (
-            <div>
-              <label className="flex items-center gap-1.5 mb-2">
-                <Text size="2" weight="medium" className="text-slate-700">
-                  Tahun Ajaran <span className="text-red-500">*</span>
-                </Text>
-              </label>
-              <Select.Root value={selectedTahunAjaran} onValueChange={onTahunAjaranChange}>
-                <Select.Trigger style={{ borderRadius: 0 }} className="w-full border-slate-300" placeholder="Pilih tahun ajaran" />
-                <Select.Content style={{ borderRadius: 0 }}>
-                  {tahunAjaranList?.map(ta => (
-                    <Select.Item key={ta.id} value={ta.id}>{ta.nama}</Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
-            </div>
-          )}
+          {/* Tahun Ajaran - Always visible */}
+          <div>
+            <label className="flex items-center gap-1.5 mb-2">
+              <Text size="2" weight="medium" className="text-slate-700">
+                Tahun Ajaran <span className="text-red-500">*</span>
+              </Text>
+            </label>
+            <Select.Root value={selectedTahunAjaran} onValueChange={onTahunAjaranChange}>
+              <Select.Trigger style={{ borderRadius: 0 }} className="w-full border-slate-300" placeholder="Pilih tahun ajaran" />
+              <Select.Content style={{ borderRadius: 0 }}>
+                {tahunAjaranList?.map(ta => (
+                  <Select.Item key={ta.id} value={ta.id}>{ta.nama}</Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </div>
 
+          {/* Target Tagihan - Always visible */}
           <div>
             <label className="flex items-center gap-1.5 mb-2">
               <Text size="2" weight="medium" className="text-slate-700">
@@ -122,7 +122,7 @@ export function TargetSiswaSection({
           )}
 
           {targetType === 'siswa' && (
-            <div>
+            <div className="col-span-2">
               <label className="flex items-center gap-1.5 mb-2">
                 <Text size="2" weight="medium" className="text-slate-700">
                   Siswa <span className="text-red-500">*</span>
@@ -138,11 +138,16 @@ export function TargetSiswaSection({
                   ))}
                 </Select.Content>
               </Select.Root>
+              {selectedTahunAjaran && riwayatKelasSiswaList?.length === 0 && (
+                <Text size="1" className="text-amber-600 mt-1">
+                  Tidak ada siswa untuk tahun ajaran yang dipilih
+                </Text>
+              )}
             </div>
           )}
         </div>
 
-        {(targetType !== 'siswa' && selectedTahunAjaran) && (
+        {selectedTahunAjaran && (
           <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border-2 border-blue-300 mt-4">
             <Text size="2" weight="medium" className="text-blue-900">
               Target: {filteredSiswaCount} siswa

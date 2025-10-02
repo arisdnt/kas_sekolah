@@ -21,7 +21,8 @@ export function usePembayaran() {
           riwayat_kelas_siswa:id_riwayat_kelas_siswa(
             siswa:id_siswa(nama_lengkap, nisn)
           )
-        )
+        ),
+        rincian_pembayaran(jumlah_dibayar)
       `)
       .order('tanggal_dibuat', { ascending: false })
 
@@ -30,7 +31,16 @@ export function usePembayaran() {
       return []
     }
     
-    return result ?? []
+    // Calculate total pembayaran for each item
+    const dataWithTotals = (result ?? []).map(item => ({
+      ...item,
+      total_dibayar: (item.rincian_pembayaran || []).reduce(
+        (sum, r) => sum + parseFloat(r.jumlah_dibayar || 0), 
+        0
+      )
+    }))
+    
+    return dataWithTotals
   }, [])
 
   const fetchTagihanList = useCallback(async () => {
