@@ -114,7 +114,7 @@ export function DetailSiswa() {
 
         {/* Content - Scrollable */}
         <div className="flex-1 overflow-auto excel-scrollbar bg-slate-50">
-          <div className="max-w-7xl mx-auto p-6 space-y-6">
+          <div className="p-6 space-y-4">
             {/* Informasi Siswa */}
             <InfoSiswaSection siswa={siswa} />
 
