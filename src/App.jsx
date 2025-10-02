@@ -19,7 +19,7 @@ import { Pembayaran } from './pages/Pembayaran/index'
 import { CreatePembayaran } from './pages/Pembayaran/CreatePembayaran'
 import { EditPembayaran } from './pages/Pembayaran/EditPembayaran'
 import { DetailPembayaran } from './pages/Pembayaran/DetailPembayaran'
-import { Pengaturan } from './pages/Pengaturan'
+import { UbahPassword } from './pages/UbahPassword'
 import { ProtectedShell } from './components/ProtectedShell'
 
 const routes = [
@@ -41,7 +41,7 @@ const routes = [
   { path: 'pembayaran/create', element: <CreatePembayaran /> },
   { path: 'pembayaran/edit/:id', element: <EditPembayaran /> },
   { path: 'pembayaran/detail/:id', element: <DetailPembayaran /> },
-  { path: 'pengaturan', element: <Pengaturan /> },
+  { path: 'ubah-password', element: <UbahPassword /> },
 ]
 
 function App() {

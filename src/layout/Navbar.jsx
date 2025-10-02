@@ -325,7 +325,10 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
               </DropdownMenu.Trigger>
 
               <DropdownMenu.Content className="w-56 mt-2" align="end">
-                <DropdownMenu.Item className="flex items-center space-x-2 p-3">
+                <DropdownMenu.Item 
+                  className="flex items-center space-x-2 p-3 cursor-pointer"
+                  onClick={() => navigate('/ubah-password')}
+                >
                   <User className="h-4 w-4" />
                   <div>
                     <div className="font-medium">{user?.email?.split('@')[0] || 'User'}</div>
@@ -335,18 +338,18 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
 
                 <DropdownMenu.Separator />
 
-                <DropdownMenu.Item 
+                <DropdownMenu.Item
                   className="flex items-center space-x-2 p-2 cursor-pointer"
-                  onClick={() => navigate('/pengaturan')}
+                  onClick={() => navigate('/ubah-password')}
                 >
                   <GearIcon className="h-4 w-4" />
-                  <span>Pengaturan</span>
+                  <span>Ubah Password</span>
                 </DropdownMenu.Item>
 
                 <DropdownMenu.Separator />
 
                 <DropdownMenu.Item
-                  className="flex items-center space-x-2 p-2 text-red-600 focus:text-red-600"
+                  className="flex items-center space-x-2 p-2 text-red-600 focus:text-red-600 cursor-pointer"
                   onClick={handleLogout}
                 >
                   <ExitIcon className="h-4 w-4" />
