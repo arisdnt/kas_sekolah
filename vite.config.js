@@ -13,6 +13,7 @@ export default defineConfig({
     }
   },
   server: {
+    host: true, // Bind to all network interfaces for LAN access
     port: 5175,
     strictPort: true
   }

@@ -140,7 +140,28 @@ export function useSiswa() {
 
       await refreshData()
     } catch (err) {
-      setError(err.message)
+      // Deteksi error foreign key constraint
+      const errorMessage = err.message || ''
+      
+      if (errorMessage.includes('violates foreign key constraint')) {
+        // Parse nama tabel dari error message
+        const tableMatch = errorMessage.match(/on table "([^"]+)"/)
+        const tableName = tableMatch ? tableMatch[1] : 'tabel terkait'
+        
+        // Mapping nama tabel ke nama yang lebih user-friendly
+        const tableNameMap = {
+          'riwayat_kelas_siswa': 'Riwayat Kelas Siswa',
+          'transaksi': 'Transaksi',
+          'pembayaran': 'Pembayaran',
+          'tagihan': 'Tagihan'
+        }
+        
+        const friendlyTableName = tableNameMap[tableName] || tableName
+        
+        setError(`Siswa tidak dapat dihapus karena masih memiliki data di tabel "${friendlyTableName}". Hapus data di tabel tersebut terlebih dahulu.`)
+      } else {
+        setError(err.message)
+      }
       throw err
     }
   }
