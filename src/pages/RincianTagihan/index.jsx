@@ -66,7 +66,7 @@ function RincianTagihanContent() {
 
   return (
     <PageLayout>
-        <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full">
         {error ? (
           <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-4 shrink-0">
             <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
@@ -112,8 +112,7 @@ function RincianTagihanContent() {
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
       />
-        </div>
-      </PageLayout>
+    </PageLayout>
   )
 }
 

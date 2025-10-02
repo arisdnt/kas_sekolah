@@ -2,6 +2,23 @@ const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const isDev = process.env.NODE_ENV === 'development';
 
+// Fix IPC flooding protection for portable builds
+app.commandLine.appendSwitch('--disable-ipc-flooding-protection');
+app.commandLine.appendSwitch('--disable-web-security');
+app.commandLine.appendSwitch('--allow-running-insecure-content');
+
+// Disable developer tools and hide Electron traces
+app.commandLine.appendSwitch('--disable-dev-shm-usage');
+app.commandLine.appendSwitch('--disable-extensions');
+app.commandLine.appendSwitch('--disable-plugins');
+app.commandLine.appendSwitch('--disable-default-apps');
+app.commandLine.appendSwitch('--no-sandbox');
+app.commandLine.appendSwitch('--disable-background-timer-throttling');
+app.commandLine.appendSwitch('--disable-backgrounding-occluded-windows');
+app.commandLine.appendSwitch('--disable-renderer-backgrounding');
+app.commandLine.appendSwitch('--disable-features=TranslateUI');
+app.commandLine.appendSwitch('--disable-component-extensions-with-background-pages');
+
 // Enable live reload for Electron in dev mode
 if (isDev) {
   require('electron-reload')(__dirname, {
@@ -25,13 +42,24 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      webSecurity: true,
-      preload: path.join(__dirname, 'preload.cjs')
+      webSecurity: false, // Disable for portable builds
+      preload: path.join(__dirname, 'preload.cjs'),
+      additionalArguments: ['--disable-ipc-flooding-protection'], // Fix IPC flooding
+      allowRunningInsecureContent: true, // Allow local content
+      experimentalFeatures: true,
+      devTools: false // Disable developer tools in production
     },
     icon: path.join(__dirname, '../public/vite.svg'), // App icon
     show: false, // Don't show until ready-to-show
     titleBarStyle: 'hidden', // Hide title bar for all platforms
   });
+
+  // Hide Electron traces by changing User-Agent
+  if (!isDev) {
+    mainWindow.webContents.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    );
+  }
 
   // Load the app
   if (isDev) {
@@ -53,6 +81,28 @@ function createWindow() {
       mainWindow.focus();
     }
   });
+
+  // Disable developer tools in production
+  if (!isDev) {
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+      // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+      if (input.key === 'F12' || 
+          (input.control && input.shift && (input.key === 'I' || input.key === 'J')) ||
+          (input.control && input.key === 'U')) {
+        event.preventDefault();
+      }
+    });
+
+    // Disable context menu (right-click menu)
+    mainWindow.webContents.on('context-menu', (event) => {
+      event.preventDefault();
+    });
+
+    // Block opening developer tools
+    mainWindow.webContents.setWindowOpenHandler(() => {
+      return { action: 'deny' };
+    });
+  }
 
   // Emitted when the window is closed
   mainWindow.on('closed', () => {
@@ -137,6 +187,12 @@ app.on('web-contents-created', (event, contents) => {
 });
 
 function createMenu() {
+  // Hide menu in production for cleaner look
+  if (!isDev) {
+    Menu.setApplicationMenu(null);
+    return;
+  }
+
   const template = [
     {
       label: 'File',
@@ -166,7 +222,8 @@ function createMenu() {
       submenu: [
         { role: 'reload' },
         { role: 'forceReload' },
-        { role: 'toggleDevTools' },
+        // Remove toggleDevTools in production
+        ...(isDev ? [{ role: 'toggleDevTools' }] : []),
         { type: 'separator' },
         { role: 'resetZoom' },
         { role: 'zoomIn' },

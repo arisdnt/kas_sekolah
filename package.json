@@ -12,7 +12,9 @@
     "dev:electron": "wait-on http://localhost:5174 && cross-env NODE_ENV=development electron .",
     "build": "vite build",
     "build:electron": "npm run build && electron-builder",
+    "build:portable": "npm run build && electron-builder --win portable --ia32 --publish=never",
     "dist": "npm run build && electron-builder --publish=never",
+    "dist:portable": "npm run build && electron-builder --win portable --ia32 --publish=never",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -75,11 +77,19 @@
         {
           "target": "nsis",
           "arch": [
-            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
             "ia32"
           ]
         }
       ]
+    },
+    "portable": {
+      "artifactName": "${productName} Portable ${version} x86.${ext}"
     },
     "linux": {
       "target": [

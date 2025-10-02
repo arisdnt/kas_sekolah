@@ -22,7 +22,26 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showNotification: (message) => ipcRenderer.invoke('show-notification', message)
 });
 
-// Remove security warnings
+// Remove security warnings and hide Electron traces
 delete window.module;
 delete window.exports;
 delete window.require;
+
+// Hide Electron-specific global variables
+window.addEventListener('DOMContentLoaded', () => {
+  // Remove Electron process info
+  if (window.process && window.process.versions && window.process.versions.electron) {
+    delete window.process.versions.electron;
+  }
+  
+  // Hide other Electron indicators
+  delete window.chrome;
+  delete window.webkitURL;
+  
+  // Prevent access to Node.js globals
+  if (typeof global !== 'undefined') {
+    delete global.process;
+    delete global.Buffer;
+    delete global.require;
+  }
+});
