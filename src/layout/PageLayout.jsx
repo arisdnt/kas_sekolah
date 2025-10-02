@@ -2,9 +2,9 @@ import { Heading, Text } from '@radix-ui/themes'
 
 export function PageLayout({ title, description, children }) {
   return (
-    <div className="px-6 py-6 h-full flex flex-col">
+    <div className="px-3 py-3 h-full flex flex-col">
       {(title || description) && (
-        <div className="mb-6 shrink-0">
+        <div className="mb-3 shrink-0">
           {title ? (
             <Heading size="8" className="text-gray-900 mb-2">
               {title}

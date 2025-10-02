@@ -35,6 +35,7 @@ export function SiswaTable({
   onAdd,
   selectedItem,
   onSelectItem,
+  onViewDetail,
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -96,11 +97,11 @@ export function SiswaTable({
             {/* Search */}
             <div className="flex-1 min-w-[240px] max-w-xs">
               <TextField.Root
-                placeholder="🔍 Cari nama atau NISN..."
+                placeholder="Cari nama atau NISN..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 size="2"
-                style={{ 
+                style={{
                   borderRadius: 0,
                   border: '1px solid #cbd5e1',
                   backgroundColor: '#ffffff'
@@ -199,9 +200,6 @@ export function SiswaTable({
         {/* Table Container with Excel-style grid */}
         <div className="relative flex-1 min-h-0">
           <div className="h-full overflow-auto excel-scrollbar">
-            {isRefreshing && !isLoading ? (
-              <div className="pointer-events-none sticky top-0 z-20 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse" />
-            ) : null}
             <table className="min-w-full table-fixed text-sm border-collapse">
               <colgroup>
                 <col style={{ width: '25%' }} />
@@ -243,7 +241,7 @@ export function SiswaTable({
               <tbody>
                 {isLoading
                   ? Array.from({ length: 6 }).map((_, index) => (
-                      <tr key={`siswa-skeleton-${index}`} className="animate-pulse border-b border-slate-200 bg-white">
+                      <tr key={`siswa-skeleton-${index}`} className="border-b border-slate-200 bg-white">
                         <td className="px-4 py-3 border-r border-slate-200">
                           <div className="space-y-2">
                             <div className="h-4 w-48 bg-slate-200" />
@@ -274,11 +272,11 @@ export function SiswaTable({
                   <tr
                     key={item.id}
                     onClick={() => onSelectItem(item)}
-                    className={`group cursor-pointer transition-colors border-b border-slate-200 ${
+                    className={`group cursor-pointer border-b border-slate-200 ${
                       selectedItem?.id === item.id
                         ? 'bg-blue-100 border-l-4 border-l-blue-600'
-                        : index % 2 === 0 
-                          ? 'bg-white hover:bg-blue-50' 
+                        : index % 2 === 0
+                          ? 'bg-white hover:bg-blue-50'
                           : 'bg-slate-50 hover:bg-blue-50'
                     }`}
                   >
@@ -313,7 +311,8 @@ export function SiswaTable({
                           checked={item.status_aktif}
                           onCheckedChange={() => onToggleStatus(item)}
                           size="2"
-                          className="cursor-pointer"
+                          className="cursor-pointer focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                          style={{ outline: 'none', boxShadow: 'none' }}
                         />
                         <Badge
                           variant="solid"
@@ -338,7 +337,7 @@ export function SiswaTable({
                           variant="soft"
                           onClick={(e) => {
                             e.stopPropagation()
-                            onSelectItem(item)
+                            onViewDetail && onViewDetail(item)
                           }}
                           className="cursor-pointer hover:bg-slate-100 text-slate-700 border border-slate-200"
                           style={{ borderRadius: 0 }}
@@ -424,7 +423,7 @@ export function SiswaTable({
         </div>
       </div>
 
-      {/* Excel-style scrollbar */}
+      {/* Excel-style scrollbar & Switch styling */}
       <style>{`
         .excel-scrollbar::-webkit-scrollbar {
           width: 16px;
@@ -444,6 +443,23 @@ export function SiswaTable({
         }
         .excel-scrollbar::-webkit-scrollbar-corner {
           background: #f1f5f9;
+        }
+        
+        /* Remove focus outline from Switch */
+        button[role="switch"],
+        button[role="switch"]:focus,
+        button[role="switch"]:focus-visible,
+        button[role="switch"]:active {
+          outline: none !important;
+          box-shadow: none !important;
+          border: none !important;
+        }
+        
+        /* Remove Radix UI default focus styles */
+        .rt-SwitchRoot:focus,
+        .rt-SwitchRoot:focus-visible {
+          outline: none !important;
+          box-shadow: none !important;
         }
       `}</style>
     </div>
