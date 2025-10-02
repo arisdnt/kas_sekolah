@@ -9,6 +9,7 @@ import { RiwayatKelasSiswa } from './pages/RiwayatKelasSiswa/index'
 import { WaliKelas } from './pages/WaliKelas/index'
 import { RiwayatWaliKelas } from './pages/RiwayatWaliKelas/index'
 import { Peminatan } from './pages/Peminatan/index'
+import { PeminatanSiswa } from './pages/PeminatanSiswa/index'
 import { JenisPembayaran } from './pages/JenisPembayaran/index'
 import { Tagihan } from './pages/Tagihan/index'
 import { CreateTagihan } from './pages/Tagihan/CreateTagihan'
@@ -29,6 +30,7 @@ const routes = [
   { path: 'wali-kelas', element: <WaliKelas /> },
   { path: 'riwayat-wali-kelas', element: <RiwayatWaliKelas /> },
   { path: 'peminatan', element: <Peminatan /> },
+  { path: 'peminatan-siswa', element: <PeminatanSiswa /> },
   { path: 'jenis-pembayaran', element: <JenisPembayaran /> },
   { path: 'tagihan', element: <Tagihan /> },
   { path: 'tagihan/create', element: <CreateTagihan /> },
