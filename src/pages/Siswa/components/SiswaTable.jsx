@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Badge, IconButton, Switch, Text, Button, TextField, Select } from '@radix-ui/themes'
 import { Pencil1Icon, TrashIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import { Clock, Plus, X, Users, Eye } from 'lucide-react'
@@ -49,6 +49,75 @@ export function SiswaTable({
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [filterTahunAjaran, setFilterTahunAjaran] = useState('all')
+  const [filterTingkat, setFilterTingkat] = useState('all')
+  const [filterKelas, setFilterKelas] = useState('all')
+
+  const {
+    tahunAjaranOptions,
+    tingkatOptions,
+    kelasOptions,
+  } = useMemo(() => {
+    const tahunAjaranMap = new Map()
+    const tingkatSet = new Set()
+    const kelasMap = new Map()
+
+    data.forEach((item) => {
+      const tahun = item.tahun_ajaran_terbaru
+      if (tahun?.id && !tahunAjaranMap.has(tahun.id)) {
+        tahunAjaranMap.set(tahun.id, {
+          value: tahun.id,
+          label: tahun.nama || 'Tanpa Tahun Ajaran',
+        })
+      }
+
+      const tingkat = item.kelas_terbaru?.tingkat
+      if (tingkat) {
+        tingkatSet.add(String(tingkat))
+      }
+
+      const kelas = item.kelas_terbaru
+      if (kelas?.id && !kelasMap.has(kelas.id)) {
+        const label = [kelas.tingkat, kelas.nama_sub_kelas]
+          .filter(Boolean)
+          .join(' ') || 'Tanpa Kelas'
+        kelasMap.set(kelas.id, {
+          value: kelas.id,
+          label,
+          tingkat: kelas.tingkat ? String(kelas.tingkat) : null,
+        })
+      }
+    })
+
+    return {
+      tahunAjaranOptions: Array.from(tahunAjaranMap.values()).sort((a, b) => a.label.localeCompare(b.label)),
+      tingkatOptions: Array.from(tingkatSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+      kelasOptions: Array.from(kelasMap.values()).sort((a, b) => a.label.localeCompare(b.label)),
+    }
+  }, [data])
+
+  const filteredKelasOptions = useMemo(() => {
+    if (filterTingkat === 'all') return kelasOptions
+    return kelasOptions.filter((option) => option.tingkat === filterTingkat)
+  }, [kelasOptions, filterTingkat])
+
+  useEffect(() => {
+    if (filterTahunAjaran !== 'all' && !tahunAjaranOptions.some((option) => option.value === filterTahunAjaran)) {
+      setFilterTahunAjaran('all')
+    }
+  }, [filterTahunAjaran, tahunAjaranOptions])
+
+  useEffect(() => {
+    if (filterTingkat !== 'all' && !tingkatOptions.includes(filterTingkat)) {
+      setFilterTingkat('all')
+    }
+  }, [filterTingkat, tingkatOptions])
+
+  useEffect(() => {
+    if (filterKelas !== 'all' && !filteredKelasOptions.some((option) => option.value === filterKelas)) {
+      setFilterKelas('all')
+    }
+  }, [filterKelas, filteredKelasOptions])
 
   const filteredData = useMemo(() => {
     let filtered = [...data]
@@ -68,8 +137,20 @@ export function SiswaTable({
       filtered = filtered.filter((item) => !item.status_aktif)
     }
 
+    if (filterTahunAjaran !== 'all') {
+      filtered = filtered.filter((item) => item.tahun_ajaran_terbaru?.id === filterTahunAjaran)
+    }
+
+    if (filterTingkat !== 'all') {
+      filtered = filtered.filter((item) => String(item.kelas_terbaru?.tingkat || '') === filterTingkat)
+    }
+
+    if (filterKelas !== 'all') {
+      filtered = filtered.filter((item) => item.kelas_terbaru?.id === filterKelas)
+    }
+
     return filtered
-  }, [data, searchQuery, filterStatus])
+  }, [data, searchQuery, filterStatus, filterTahunAjaran, filterTingkat, filterKelas])
 
   const stats = useMemo(() => {
     const total = data.length
@@ -90,11 +171,20 @@ export function SiswaTable({
   }, [data, filteredData])
 
   const isEmpty = !isLoading && filteredData.length === 0
-  const hasActiveFilters = searchQuery.trim() || filterStatus !== 'all'
+  const hasActiveFilters = Boolean(
+    searchQuery.trim() ||
+    filterStatus !== 'all' ||
+    filterTahunAjaran !== 'all' ||
+    filterTingkat !== 'all' ||
+    filterKelas !== 'all'
+  )
 
   const handleClearFilters = () => {
     setSearchQuery('')
     setFilterStatus('all')
+    setFilterTahunAjaran('all')
+    setFilterTingkat('all')
+    setFilterKelas('all')
   }
 
   return (
@@ -154,6 +244,75 @@ export function SiswaTable({
               </Select.Root>
             </div>
 
+            {/* Filter Tahun Ajaran */}
+            <div className="flex items-center gap-2">
+              <Select.Root value={filterTahunAjaran} onValueChange={setFilterTahunAjaran}>
+                <Select.Trigger
+                  style={{
+                    borderRadius: 0,
+                    minWidth: '160px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff'
+                  }}
+                  className="cursor-pointer font-sans"
+                />
+                <Select.Content style={{ borderRadius: 0 }}>
+                  <Select.Item value="all">📅 Semua Tahun Ajaran</Select.Item>
+                  {tahunAjaranOptions.map((option) => (
+                    <Select.Item key={option.value} value={option.value}>
+                      {option.label}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            </div>
+
+            {/* Filter Tingkat */}
+            <div className="flex items-center gap-2">
+              <Select.Root value={filterTingkat} onValueChange={setFilterTingkat}>
+                <Select.Trigger
+                  style={{
+                    borderRadius: 0,
+                    minWidth: '140px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff'
+                  }}
+                  className="cursor-pointer font-sans"
+                />
+                <Select.Content style={{ borderRadius: 0 }}>
+                  <Select.Item value="all">🏷️ Semua Tingkat</Select.Item>
+                  {tingkatOptions.map((option) => (
+                    <Select.Item key={option} value={option}>
+                      Tingkat {option}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            </div>
+
+            {/* Filter Kelas */}
+            <div className="flex items-center gap-2">
+              <Select.Root value={filterKelas} onValueChange={setFilterKelas}>
+                <Select.Trigger
+                  style={{
+                    borderRadius: 0,
+                    minWidth: '180px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff'
+                  }}
+                  className="cursor-pointer font-sans"
+                />
+                <Select.Content style={{ borderRadius: 0 }}>
+                  <Select.Item value="all">🏫 Semua Kelas</Select.Item>
+                  {filteredKelasOptions.map((option) => (
+                    <Select.Item key={option.value} value={option.value}>
+                      {option.label}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            </div>
+
             {/* Reset Filter */}
             {hasActiveFilters && (
               <Button
@@ -180,6 +339,12 @@ export function SiswaTable({
                 <span className="text-emerald-700">Aktif:</span>
                 <span className="font-bold text-emerald-900">{stats.active}</span>
               </div>
+              {isRefreshing && (
+                <div className="flex items-center gap-1 px-3 py-1.5 bg-sky-50 border border-sky-200 shadow-sm text-sky-700">
+                  <span className="inline-flex h-2 w-2 rounded-full bg-sky-500 animate-pulse" />
+                  <span>Menyegarkan…</span>
+                </div>
+              )}
               {hasActiveFilters && (
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-300 shadow-sm">
                   <span className="text-blue-700">Tampil:</span>
