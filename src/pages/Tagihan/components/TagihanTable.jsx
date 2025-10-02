@@ -284,14 +284,16 @@ export function TagihanTable({
                       )}
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">
-                      <Text size="2" className="text-slate-700">
-                        {item.riwayat_kelas_siswa?.siswa?.nama_lengkap || '—'}
-                      </Text>
-                      {item.riwayat_kelas_siswa?.siswa?.nisn && (
-                        <Text size="1" className="text-slate-500 font-mono">
-                          {item.riwayat_kelas_siswa.siswa.nisn}
+                      <div>
+                        <Text size="2" weight="medium" className="text-slate-900 block">
+                          {item.riwayat_kelas_siswa?.siswa?.nama_lengkap || '—'}
                         </Text>
-                      )}
+                        {item.riwayat_kelas_siswa?.siswa?.nisn && (
+                          <Text size="1" className="text-red-600 font-mono block mt-0.5">
+                            NISN: {item.riwayat_kelas_siswa.siswa.nisn}
+                          </Text>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" className="text-slate-700">
@@ -301,14 +303,16 @@ export function TagihanTable({
                       </Text>
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">
-                      <Text size="2" weight="bold" className="text-slate-900">
-                        {formatCurrency(item.total_tagihan)}
-                      </Text>
-                      {item.rincian_tagihan && item.rincian_tagihan.length > 0 && (
-                        <Text size="1" className="text-slate-500">
-                          {item.rincian_tagihan.length} item
+                      <div>
+                        <Text size="2" weight="bold" className="text-slate-900 block">
+                          {formatCurrency(item.total_tagihan)}
                         </Text>
-                      )}
+                        {item.rincian_tagihan && item.rincian_tagihan.length > 0 && (
+                          <Text size="1" className="text-red-600 block mt-0.5">
+                            {item.rincian_tagihan.length} item
+                          </Text>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" weight="bold" className="text-green-700">
