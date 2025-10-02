@@ -8,6 +8,7 @@ import { KelasTable } from './components/KelasTable'
 import KelasFormDialog from './components/KelasFormDialog'
 import { DeleteConfirmDialog } from './components/DeleteConfirmDialog'
 import { DetailPanel } from './components/DetailPanel'
+import { KelasDetailModal } from './components/KelasDetailModal'
 
 function KelasContent() {
   const {
@@ -23,6 +24,7 @@ function KelasContent() {
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [currentItem, setCurrentItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
@@ -72,6 +74,11 @@ function KelasContent() {
     setDeleteDialogOpen(true)
   }
 
+  const handleViewDetail = (item) => {
+    setCurrentItem(item)
+    setDetailModalOpen(true)
+  }
+
   const handleDelete = async () => {
     if (currentItem) {
       await deleteItem(currentItem.id)
@@ -105,6 +112,7 @@ function KelasContent() {
               isRefreshing={isRefreshing}
               onEdit={handleOpenEdit}
               onDelete={handleOpenDelete}
+              onViewDetail={handleViewDetail}
               onAdd={handleOpenCreate}
               selectedItem={selectedItem}
               onSelectItem={setSelectedItem}
@@ -135,6 +143,12 @@ function KelasContent() {
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
         itemName={currentItem ? `${currentItem.tingkat} ${currentItem.nama_sub_kelas}` : ''}
+      />
+
+      <KelasDetailModal
+        open={detailModalOpen}
+        onOpenChange={setDetailModalOpen}
+        kelas={currentItem}
       />
       </PageLayout>
   )

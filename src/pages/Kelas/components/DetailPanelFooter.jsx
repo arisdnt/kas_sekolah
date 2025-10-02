@@ -1,17 +1,21 @@
-import { Clock } from 'lucide-react'
-import { formatDateTime } from '../utils/dateHelpers'
+import { Text } from '@radix-ui/themes'
 
 export function DetailPanelFooter({ selectedItem, footerInfo }) {
   return (
-    <div className="shrink-0 px-4 py-3 text-xs text-slate-500 border-t border-slate-200/60">
+    <div className="shrink-0 border-t-2 border-slate-300 bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-2.5">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Clock className="h-3.5 w-3.5" />
-          <span>Diperbarui {selectedItem.diperbarui_pada ? formatDateTime(selectedItem.diperbarui_pada) : formatDateTime(selectedItem.dibuat_pada)}</span>
-        </div>
-        <span className="font-mono">ID {selectedItem.id}</span>
+        <Text size="1" className="text-slate-600 font-medium">
+          Data kelas • Sistem Kas Sekolah
+        </Text>
+        <Text size="1" className="text-slate-500 font-mono">
+          {selectedItem.id?.slice(0, 8) || '—'}
+        </Text>
       </div>
-      {footerInfo ? <div className="mt-1 text-right">{footerInfo}</div> : null}
+      {footerInfo && (
+        <Text size="1" className="text-slate-500 text-right mt-1 block">
+          {footerInfo}
+        </Text>
+      )}
     </div>
   )
 }

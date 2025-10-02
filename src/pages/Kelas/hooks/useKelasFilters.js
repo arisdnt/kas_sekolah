@@ -28,6 +28,9 @@ export function useKelasFilters(data) {
     const total = data.length
     const tingkatList = [...new Set(data.map(item => item.tingkat))].sort()
     const filtered = filteredData.length
+    const tingkat10 = data.filter(item => item.tingkat === '10').length
+    const tingkat11 = data.filter(item => item.tingkat === '11').length
+    const tingkat12 = data.filter(item => item.tingkat === '12').length
     const lastUpdate = data
       .map((item) => item.diperbarui_pada || item.dibuat_pada)
       .filter(Boolean)
@@ -38,6 +41,9 @@ export function useKelasFilters(data) {
       total,
       tingkatList,
       filtered,
+      tingkat10,
+      tingkat11,
+      tingkat12,
       lastUpdate: lastUpdate ? formatDateTime(lastUpdate) : 'Belum ada aktivitas',
     }
   }, [data, filteredData])

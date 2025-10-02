@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import {
   Avatar,
   Badge,
@@ -16,7 +17,7 @@ import {
   HamburgerMenuIcon,
   ChevronDownIcon,
 } from '@radix-ui/react-icons'
-import { User, UserCircle, GraduationCap, Wallet } from 'lucide-react'
+import { User, UserCircle, GraduationCap, Wallet, Minus, Square, X, Maximize2, Maximize, Minimize, RefreshCw } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
@@ -39,19 +40,92 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const [isMaximized, setIsMaximized] = useState(false)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // Check if running in Electron
+  const isElectron = window.electronAPI !== undefined
+
+  useEffect(() => {
+    // Check initial window state
+    const checkWindowState = async () => {
+      if (isElectron && window.electronAPI.getWindowState) {
+        const state = await window.electronAPI.getWindowState()
+        if (state) {
+          setIsMaximized(state.isMaximized)
+          setIsFullScreen(state.isFullScreen)
+        }
+      }
+    }
+    
+    checkWindowState()
+    
+    // Poll window state every 500ms to keep UI in sync
+    const interval = setInterval(checkWindowState, 500)
+    
+    return () => clearInterval(interval)
+  }, [isElectron])
 
   async function handleLogout() {
     await supabase.auth.signOut()
+  }
+
+  const handleMinimize = () => {
+    if (isElectron && window.electronAPI.minimizeWindow) {
+      window.electronAPI.minimizeWindow()
+    }
+  }
+
+  const handleMaximize = async () => {
+    if (isElectron && window.electronAPI.maximizeWindow) {
+      await window.electronAPI.maximizeWindow()
+      // Update state immediately after maximize/restore
+      const state = await window.electronAPI.getWindowState()
+      if (state) {
+        setIsMaximized(state.isMaximized)
+      }
+    }
+  }
+
+  const handleClose = () => {
+    if (isElectron && window.electronAPI.closeWindow) {
+      window.electronAPI.closeWindow()
+    }
+  }
+
+  const handleFullScreen = async () => {
+    if (isElectron && window.electronAPI.toggleFullScreen) {
+      await window.electronAPI.toggleFullScreen()
+      // Update state immediately after toggle
+      const state = await window.electronAPI.getWindowState()
+      if (state) {
+        setIsFullScreen(state.isFullScreen)
+      }
+    }
+  }
+
+  const handleRefresh = () => {
+    setIsRefreshing(true)
+    
+    // Dispatch custom event untuk trigger refresh di semua components
+    window.dispatchEvent(new CustomEvent('app-refresh'))
+    
+    // Reset refreshing state after 1 second
+    setTimeout(() => {
+      setIsRefreshing(false)
+    }, 1000)
   }
 
   const isActive = (href) => location.pathname === href
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-[#476EAE] to-[#5A7FC7] shadow-lg"
+      className="fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-[#476EAE] to-[#5A7FC7] shadow-lg select-none"
+      style={isElectron ? { WebkitAppRegion: 'drag', appRegion: 'drag' } : {}}
     >
       <div className="px-6">
-        <div className="flex h-12 items-center justify-between">
+        <div className="flex h-12 items-center justify-between" style={isElectron ? { WebkitAppRegion: 'no-drag', appRegion: 'no-drag' } : {}}>
           {/* Left section - Logo and Navigation */}
           <div className="flex items-center space-x-8 flex-1">
             {/* Logo/Brand */}
@@ -154,7 +228,7 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
           </div>
 
 
-          {/* Right section - Status, Notifications, User Menu */}
+          {/* Right section - Status, Refresh, Notifications, User Menu, Window Controls */}
           <div className="flex items-center space-x-4">
             {/* Realtime Status */}
             <div className="hidden sm:block">
@@ -169,6 +243,19 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
                 {realtimeStatus === 'connected' ? 'Online' : 'Offline'}
               </Badge>
             </div>
+
+            {/* Refresh Button */}
+            <Tooltip content="Refresh Data">
+              <IconButton
+                variant="ghost"
+                size="2"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="text-white/80 hover:text-white hover:bg-white/10"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </IconButton>
+            </Tooltip>
 
             {/* Notifications */}
             <Tooltip content="Notifications">
@@ -245,6 +332,59 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
               </IconButton>
             </div>
           </div>
+
+          {/* Windows Controls (only show in Electron) - Outside main flex container */}
+          {isElectron && (
+            <div className="flex items-center -mr-3">
+              {/* Minimize */}
+              <button
+                onClick={handleMinimize}
+                className="h-12 w-12 flex items-center justify-center text-white/90 hover:bg-white/15 transition-colors"
+                title="Minimize"
+                type="button"
+              >
+                <Minus className="h-4 w-4 stroke-[2.5]" />
+              </button>
+
+              {/* Maximize/Restore */}
+              <button
+                onClick={handleMaximize}
+                className="h-12 w-12 flex items-center justify-center text-white/90 hover:bg-white/15 transition-colors"
+                title={isMaximized ? "Restore Down" : "Maximize"}
+                type="button"
+              >
+                {isMaximized ? (
+                  <Maximize2 className="h-3.5 w-3.5 stroke-[2.5]" />
+                ) : (
+                  <Square className="h-3.5 w-3.5 stroke-[2.5]" />
+                )}
+              </button>
+
+              {/* Fullscreen */}
+              <button
+                onClick={handleFullScreen}
+                className="h-12 w-12 flex items-center justify-center text-white/90 hover:bg-white/15 transition-colors"
+                title={isFullScreen ? "Exit Fullscreen" : "Fullscreen"}
+                type="button"
+              >
+                {isFullScreen ? (
+                  <Minimize className="h-3.5 w-3.5 stroke-[2.5]" />
+                ) : (
+                  <Maximize className="h-3.5 w-3.5 stroke-[2.5]" />
+                )}
+              </button>
+
+              {/* Close */}
+              <button
+                onClick={handleClose}
+                className="h-12 w-12 flex items-center justify-center text-white/90 hover:bg-red-600 hover:text-white transition-colors"
+                title="Close"
+                type="button"
+              >
+                <X className="h-4.5 w-4.5 stroke-[2.5]" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>

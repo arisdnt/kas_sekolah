@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Electron
+release
+*.tgz
+app-builds
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
- 
+
 import { PageLayout } from '../../layout/PageLayout'
 import { Text } from '@radix-ui/themes'
 import { AlertCircle } from 'lucide-react'
 import { useTahunAjaran } from './hooks/useTahunAjaran'
 import { TahunAjaranTable } from './components/TahunAjaranTable'
 import TahunAjaranFormDialog from './components/TahunAjaranFormDialog'
-import { DeleteConfirmDialog } from './components/DeleteConfirmDialog'
+import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog'
 import { DetailPanel } from './components/DetailPanel'
 
 function TahunAjaranContent() {
@@ -40,10 +40,10 @@ function TahunAjaranContent() {
         return
       }
 
-      const updatedSelection = data.find((item) => item.id === selectedItem.id)
-      if (updatedSelection && updatedSelection !== selectedItem) {
-        setSelectedItem(updatedSelection)
-      } else if (!updatedSelection) {
+      const found = data.find((item) => item.id === selectedItem.id)
+      if (found && found !== selectedItem) {
+        setSelectedItem(found)
+      } else if (!found) {
         setSelectedItem(data[0])
       }
     }
@@ -80,11 +80,12 @@ function TahunAjaranContent() {
       setCurrentItem(null)
     }
   }
+
   return (
-      <PageLayout>
-        <div className="flex flex-col h-full">
+    <PageLayout>
+      <div className="flex flex-col h-full">
         {error ? (
-          <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-4 shrink-0">
+          <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-3 shrink-0">
             <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
             <div>
               <Text size="2" weight="medium" className="text-red-700">
@@ -98,7 +99,7 @@ function TahunAjaranContent() {
         ) : null}
 
         {/* Layout 2 Kolom: 75% Tabel | 25% Detail */}
-        <div className="flex gap-4 flex-1 min-h-0">
+        <div className="flex gap-3 flex-1 min-h-0">
           {/* Kolom Kiri: Tabel (75%) */}
           <div className="w-3/4 h-full">
             <TahunAjaranTable
@@ -137,9 +138,11 @@ function TahunAjaranContent() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
-        itemName={currentItem?.nama}
+        itemName={currentItem?.nama || ''}
+        title="Hapus Tahun Ajaran"
+        description="Apakah Anda yakin ingin menghapus tahun ajaran"
       />
-      </PageLayout>
+    </PageLayout>
   )
 }
 

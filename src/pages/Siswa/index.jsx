@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
- 
+
 import { PageLayout } from '../../layout/PageLayout'
 import { Text } from '@radix-ui/themes'
 import { AlertCircle } from 'lucide-react'
 import { useSiswa } from './hooks/useSiswa'
 import { SiswaTable } from './components/SiswaTable'
 import SiswaFormDialog from './components/SiswaFormDialog'
-import { DeleteConfirmDialog } from './components/DeleteConfirmDialog'
+import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog'
 import { DetailPanel } from './components/DetailPanel'
 import { SiswaDetailModal } from './components/SiswaDetailModal'
 
@@ -150,6 +150,8 @@ function SiswaContent() {
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
         itemName={currentItem?.nama_lengkap || ''}
+        title="Hapus Siswa"
+        description="Apakah Anda yakin ingin menghapus siswa"
       />
 
       <SiswaDetailModal
