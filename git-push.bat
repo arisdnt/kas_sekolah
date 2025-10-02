@@ -41,12 +41,7 @@ del temp_status.txt
 
 if "!STATUS!"=="" (
     echo ⚠️  Tidak ada perubahan untuk di-commit.
-    set /p CONTINUE="Lanjutkan push tanpa commit baru? (y/N): "
-    if /i not "!CONTINUE!"=="y" (
-        echo ✅ Script dibatalkan.
-        pause
-        exit /b 0
-    )
+    echo 🌐 Melakukan push langsung...
 ) else (
     echo 📁 Files yang akan di-commit:
     git status --short
@@ -57,14 +52,6 @@ REM Create commit message with timestamp
 set "COMMIT_MESSAGE=%MESSAGE% - %TIMESTAMP%"
 echo 💬 Commit message: !COMMIT_MESSAGE!
 echo.
-
-REM Confirm before proceeding
-set /p CONFIRM="Lanjutkan dengan git add, commit, dan push? (Y/n): "
-if /i "!CONFIRM!"=="n" (
-    echo ✅ Script dibatalkan.
-    pause
-    exit /b 0
-)
 
 REM Git operations
 if not "!STATUS!"=="" (
@@ -102,4 +89,4 @@ echo 📜 Commit terakhir:
 git log --oneline -1
 
 echo.
-pause
+echo ✅ Script selesai dijalankan.

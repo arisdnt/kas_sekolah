@@ -37,11 +37,7 @@ try {
     
     if (!$status) {
         Write-ColorOutput Yellow "⚠️  Tidak ada perubahan untuk di-commit."
-        $continue = Read-Host "Lanjutkan push tanpa commit baru? (y/N)"
-        if ($continue -ne "y" -and $continue -ne "Y") {
-            Write-ColorOutput Blue "✅ Script dibatalkan."
-            exit 0
-        }
+        Write-ColorOutput Yellow "🌐 Melakukan push langsung..."
     } else {
         # Tampilkan files yang akan di-commit
         Write-ColorOutput Cyan "📁 Files yang akan di-commit:"
@@ -55,13 +51,6 @@ try {
     
     Write-ColorOutput Yellow "💬 Commit message: $commitMessage"
     Write-Host ""
-
-    # Konfirmasi sebelum melanjutkan
-    $confirm = Read-Host "Lanjutkan dengan git add, commit, dan push? (Y/n)"
-    if ($confirm -eq "n" -or $confirm -eq "N") {
-        Write-ColorOutput Blue "✅ Script dibatalkan."
-        exit 0
-    }
 
     # Git add semua files
     if ($status) {

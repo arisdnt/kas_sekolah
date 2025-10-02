@@ -80,10 +80,10 @@ export function SiswaDetailModal({ open, onOpenChange, siswa }) {
         {/* Content */}
         <div className="overflow-auto p-6 bg-white" style={{ maxHeight: 'calc(90vh - 80px)' }}>
           {/* Nama & Status Section */}
-          <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-200 p-4 mb-6 shadow-sm">
+          <div className="bg-slate-50 border-2 border-slate-300 p-4 mb-6">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <Text size="1" className="text-indigo-600 uppercase tracking-wider text-[0.65rem] mb-1.5 block font-bold">
+                <Text size="1" className="text-slate-500 uppercase tracking-wider text-[0.65rem] mb-1.5 block font-medium">
                   Nama Lengkap
                 </Text>
                 <Text size="6" weight="bold" className="text-slate-900 leading-tight">
@@ -94,13 +94,8 @@ export function SiswaDetailModal({ open, onOpenChange, siswa }) {
                 variant="solid"
                 color={siswa.status_aktif ? 'green' : 'gray'}
                 size="2"
-                className="text-sm font-semibold px-3 py-1.5 shrink-0 shadow-md"
-                style={{ 
-                  borderRadius: 0,
-                  background: siswa.status_aktif 
-                    ? 'linear-gradient(to right, #10b981, #059669)' 
-                    : 'linear-gradient(to right, #64748b, #475569)'
-                }}
+                className="text-sm font-semibold px-3 py-1.5 shrink-0"
+                style={{ borderRadius: 0 }}
               >
                 {siswa.status_aktif ? '✓ Aktif' : '○ Nonaktif'}
               </Badge>
@@ -213,7 +208,7 @@ export function SiswaDetailModal({ open, onOpenChange, siswa }) {
         </div>
 
         {/* Footer - Excel style */}
-        <div className="border-t-2 border-slate-300 bg-gradient-to-r from-slate-50 via-blue-50 to-indigo-50 px-5 py-3">
+        <div className="border-t-2 border-slate-300 bg-gradient-to-b from-slate-50 to-slate-100 px-5 py-3">
           <div className="flex items-center justify-between">
             <Text size="1" className="text-slate-600 font-medium">
               Data siswa • Sistem Kas Sekolah
@@ -221,7 +216,7 @@ export function SiswaDetailModal({ open, onOpenChange, siswa }) {
             <div className="flex gap-2">
               <button
                 onClick={() => onOpenChange(false)}
-                className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-semibold transition-all shadow-md hover:shadow-lg border border-blue-700"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-sm hover:shadow border border-blue-700"
                 style={{ borderRadius: 0 }}
               >
                 <span className="flex items-center gap-2">
