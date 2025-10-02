@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { IconButton, Text, Button, TextField } from '@radix-ui/themes'
-import { Pencil1Icon, TrashIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
-import { Receipt, Clock, Plus, X } from 'lucide-react'
+import { Text, TextField, Select, Badge } from '@radix-ui/themes'
+import { MagnifyingGlassIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
+import { Receipt, Plus, X, Eye, Edit, Trash2 } from 'lucide-react'
 
 function formatDate(dateStr) {
   if (!dateStr) return '—'
@@ -9,18 +9,6 @@ function formatDate(dateStr) {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
-    timeZone: 'Asia/Jakarta',
-  })
-}
-
-function formatDateTime(dateStr) {
-  if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleString('id-ID', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
     timeZone: 'Asia/Jakarta',
   })
 }
@@ -34,7 +22,16 @@ function formatCurrency(value) {
   }).format(value)
 }
 
-export function TagihanTable({ data, onEdit, onDelete, onAdd, selectedItem, onSelectItem }) {
+export function TagihanTable({
+  data,
+  isLoading,
+  onEdit,
+  onDelete,
+  onAdd,
+  selectedItem,
+  onSelectItem,
+  onViewDetail
+}) {
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredData = useMemo(() => {
@@ -68,132 +65,147 @@ export function TagihanTable({ data, onEdit, onDelete, onAdd, selectedItem, onSe
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="h-full flex flex-col border border-slate-200/80 bg-white/80 backdrop-blur">
-        <div className="border-b border-slate-200/80 bg-gradient-to-r from-slate-50 to-white">
-          <div className="flex flex-wrap items-center gap-4 px-6 py-4">
-            <div className="flex-1 min-w-[240px] max-w-xs">
-              <TextField.Root
-                placeholder="Cari nomor, judul, siswa..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                size="2"
-                style={{ borderRadius: 0 }}
-              >
+    <div className="h-full flex flex-col border border-slate-300 bg-white shadow-lg">
+      {/* Toolbar - Excel style */}
+      <div className="border-b border-slate-300 bg-gradient-to-b from-slate-100 to-slate-50 px-4 py-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search */}
+          <div className="flex-1 min-w-[240px] max-w-xs">
+            <TextField.Root
+              placeholder="Cari nomor, judul, siswa..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              size="2"
+              style={{ borderRadius: 0 }}
+              className="border-slate-300"
+            >
+              <TextField.Slot>
+                <MagnifyingGlassIcon height="16" width="16" />
+              </TextField.Slot>
+              {searchQuery && (
                 <TextField.Slot>
-                  <MagnifyingGlassIcon height="16" width="16" />
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="cursor-pointer text-slate-400 hover:text-slate-600"
+                    type="button"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </TextField.Slot>
-                {searchQuery && (
-                  <TextField.Slot>
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className="cursor-pointer text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </TextField.Slot>
-                )}
-              </TextField.Root>
-            </div>
-
-            {hasActiveFilters && (
-              <Button
-                onClick={handleClearFilters}
-                variant="soft"
-                color="gray"
-                size="2"
-                style={{ borderRadius: 0 }}
-                className="cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-
-            <div className="ml-auto flex items-center gap-2 text-xs">
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-200">
-                <span className="text-slate-500">Total:</span>
-                <span className="font-semibold text-slate-900">{stats.total}</span>
-              </div>
-              {hasActiveFilters && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 border border-blue-200">
-                  <span className="text-blue-700">Ditampilkan:</span>
-                  <span className="font-semibold text-blue-900">{stats.filtered}</span>
-                </div>
               )}
-            </div>
+            </TextField.Root>
+          </div>
 
-            <div>
-              <Button
-                onClick={onAdd}
-                className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
-                size="2"
-                style={{ borderRadius: 0 }}
-              >
-                <Plus className="h-4 w-4" />
-                Tambah Tagihan
-              </Button>
+          {/* Stats */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 shadow-sm">
+              <Text size="1" className="text-slate-600">Total:</Text>
+              <Text size="2" weight="bold" className="text-slate-900">{stats.total}</Text>
             </div>
+            {hasActiveFilters && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-300 shadow-sm">
+                <Text size="1" className="text-blue-700">Ditampilkan:</Text>
+                <Text size="2" weight="bold" className="text-blue-900">{stats.filtered}</Text>
+              </div>
+            )}
+          </div>
+
+          {/* Add Button */}
+          <div className="ml-auto">
+            <button
+              onClick={onAdd}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white border border-green-700 shadow-sm transition-colors font-medium"
+              type="button"
+            >
+              <Plus className="h-4 w-4" />
+              Tambah Tagihan
+            </button>
           </div>
         </div>
+      </div>
 
-        <div className="relative flex-1 min-h-0">
-          <div className="h-full overflow-auto">
-            <table className="min-w-full table-fixed text-sm">
-              <colgroup>
-                <col style={{ width: '13%' }} />
-                <col style={{ width: '18%' }} />
-                <col style={{ width: '16%' }} />
-                <col style={{ width: '13%' }} />
-                <col style={{ width: '12%' }} />
-                <col style={{ width: '11%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '7%' }} />
-              </colgroup>
-              <thead>
-                <tr className="bg-white/95 backdrop-blur sticky top-0 z-10 border-b border-slate-200">
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+      {/* Table Container */}
+      <div className="flex-1 overflow-auto min-h-0">
+        {isLoading ? (
+          <div className="p-4 space-y-0">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4 border-b border-slate-200 py-4">
+                <div className="h-4 w-24 bg-slate-200" />
+                <div className="h-4 w-32 bg-slate-200" />
+                <div className="h-4 w-28 bg-slate-200" />
+                <div className="h-4 w-20 bg-slate-200" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <table className="w-full border-collapse">
+            <thead className="bg-gradient-to-b from-slate-100 to-slate-50 sticky top-0 z-10">
+              <tr className="border-b-2 border-slate-300">
+                <th className="px-4 py-3 text-left border-r border-slate-200">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
                     No. Tagihan
-                  </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  </Text>
+                </th>
+                <th className="px-4 py-3 text-left border-r border-slate-200">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
                     Judul
-                  </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  </Text>
+                </th>
+                <th className="px-4 py-3 text-left border-r border-slate-200">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
                     Siswa
-                  </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  </Text>
+                </th>
+                <th className="px-4 py-3 text-left border-r border-slate-200">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
                     Kelas
-                  </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  </Text>
+                </th>
+                <th className="px-4 py-3 text-left border-r border-slate-200">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
                     Total
-                  </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  </Text>
+                </th>
+                <th className="px-4 py-3 text-left border-r border-slate-200">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
                     Tgl Tagihan
-                  </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  </Text>
+                </th>
+                <th className="px-4 py-3 text-left border-r border-slate-200">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
                     Jatuh Tempo
-                  </th>
-                  <th className="px-6 py-3 text-right text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  </Text>
+                </th>
+                <th className="px-4 py-3 text-center">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
                     Aksi
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredData.map((item) => (
+                  </Text>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.map((item, index) => {
+                const isSelected = selectedItem?.id === item.id
+                const isEven = index % 2 === 0
+
+                return (
                   <tr
                     key={item.id}
                     onClick={() => onSelectItem(item)}
-                    className={`group transition-colors cursor-pointer ${
-                      selectedItem?.id === item.id
-                        ? 'bg-blue-50 hover:bg-blue-100'
-                        : 'hover:bg-indigo-50/40'
+                    className={`border-b border-slate-200 cursor-pointer ${
+                      isSelected
+                        ? 'bg-blue-100 border-l-4 border-l-blue-600'
+                        : isEven
+                        ? 'bg-white hover:bg-blue-50'
+                        : 'bg-slate-50 hover:bg-blue-50'
                     }`}
                   >
-                    <td className="px-6 py-4 align-middle">
+                    <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" weight="medium" className="text-slate-900 font-mono">
                         {item.nomor_tagihan || '—'}
                       </Text>
                     </td>
-                    <td className="px-6 py-4 align-middle">
+                    <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" weight="medium" className="text-slate-900">
                         {item.judul || '—'}
                       </Text>
@@ -203,118 +215,148 @@ export function TagihanTable({ data, onEdit, onDelete, onAdd, selectedItem, onSe
                         </Text>
                       )}
                     </td>
-                    <td className="px-6 py-4 align-middle">
-                      <div className="flex flex-col gap-0.5">
-                        <Text size="2" className="text-slate-700">
-                          {item.riwayat_kelas_siswa?.siswa?.nama_lengkap || '—'}
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" className="text-slate-700">
+                        {item.riwayat_kelas_siswa?.siswa?.nama_lengkap || '—'}
+                      </Text>
+                      {item.riwayat_kelas_siswa?.siswa?.nisn && (
+                        <Text size="1" className="text-slate-500 font-mono">
+                          {item.riwayat_kelas_siswa.siswa.nisn}
                         </Text>
-                        {item.riwayat_kelas_siswa?.siswa?.nisn && (
-                          <Text size="1" className="text-slate-500 font-mono">
-                            {item.riwayat_kelas_siswa.siswa.nisn}
-                          </Text>
-                        )}
-                      </div>
+                      )}
                     </td>
-                    <td className="px-6 py-4 align-middle">
+                    <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" className="text-slate-700">
                         {item.riwayat_kelas_siswa?.kelas
                           ? `${item.riwayat_kelas_siswa.kelas.tingkat} ${item.riwayat_kelas_siswa.kelas.nama_sub_kelas}`
                           : '—'}
                       </Text>
                     </td>
-                    <td className="px-6 py-4 align-middle">
+                    <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" weight="bold" className="text-emerald-700">
                         {formatCurrency(item.total_tagihan)}
                       </Text>
                       {item.rincian_tagihan && item.rincian_tagihan.length > 0 && (
-                        <Text size="1" className="text-slate-500 mt-0.5">
+                        <Text size="1" className="text-slate-500">
                           {item.rincian_tagihan.length} item
                         </Text>
                       )}
                     </td>
-                    <td className="px-6 py-4 align-middle">
+                    <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" className="text-slate-700">
                         {formatDate(item.tanggal_tagihan)}
                       </Text>
                     </td>
-                    <td className="px-6 py-4 align-middle">
+                    <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" className="text-slate-700">
                         {formatDate(item.tanggal_jatuh_tempo)}
                       </Text>
                     </td>
-                    <td className="px-6 py-4 align-middle">
-                      <div className="flex justify-end gap-2">
-                        <IconButton
-                          size="1"
-                          variant="ghost"
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-center gap-1">
+                        {onViewDetail && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onViewDetail(item)
+                            }}
+                            className="h-7 w-7 flex items-center justify-center border border-slate-300 bg-white hover:bg-blue-50 hover:border-blue-400 transition-colors"
+                            title="Lihat Detail"
+                            type="button"
+                          >
+                            <Eye className="h-3.5 w-3.5 text-slate-600" />
+                          </button>
+                        )}
+                        <button
                           onClick={(e) => {
                             e.stopPropagation()
                             onEdit(item)
                           }}
-                          className="cursor-pointer hover:bg-blue-50 text-blue-600"
-                          aria-label="Edit"
+                          className="h-7 w-7 flex items-center justify-center border border-slate-300 bg-white hover:bg-amber-50 hover:border-amber-400 transition-colors"
+                          title="Edit"
+                          type="button"
                         >
-                          <Pencil1Icon />
-                        </IconButton>
-                        <IconButton
-                          size="1"
-                          variant="ghost"
+                          <Edit className="h-3.5 w-3.5 text-slate-600" />
+                        </button>
+                        <button
                           onClick={(e) => {
                             e.stopPropagation()
                             onDelete(item)
                           }}
-                          className="cursor-pointer hover:bg-red-50 text-red-600"
-                          aria-label="Hapus"
+                          className="h-7 w-7 flex items-center justify-center border border-slate-300 bg-white hover:bg-red-50 hover:border-red-400 transition-colors"
+                          title="Hapus"
+                          type="button"
                         >
-                          <TrashIcon />
-                        </IconButton>
+                          <Trash2 className="h-3.5 w-3.5 text-slate-600" />
+                        </button>
                       </div>
                     </td>
                   </tr>
-                ))}
-                {isEmpty ? (
-                  <tr>
-                    <td colSpan={8} className="relative">
-                      <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400">
-                        {hasActiveFilters ? (
-                          <>
-                            <MagnifyingGlassIcon className="h-12 w-12 text-slate-300 mb-4" />
-                            <Text size="3" className="text-slate-500 mb-1">
-                              Tidak ada data yang sesuai
-                            </Text>
-                            <Text size="2" className="text-slate-400 mb-4">
-                              Coba ubah kata kunci pencarian
-                            </Text>
-                            <Button
-                              onClick={handleClearFilters}
-                              variant="soft"
-                              size="2"
-                              style={{ borderRadius: 0 }}
-                              className="cursor-pointer"
-                            >
-                              Reset Pencarian
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Receipt className="h-12 w-12 text-slate-300 mb-4" />
-                            <Text size="3" className="text-slate-500 mb-1">
-                              Belum ada tagihan
-                            </Text>
-                            <Text size="2" className="text-slate-400">
-                              Tambahkan tagihan baru melalui tombol di atas.
-                            </Text>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                )
+              })}
+              {isEmpty && (
+                <tr>
+                  <td colSpan={8} className="py-16">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      {hasActiveFilters ? (
+                        <>
+                          <div className="mb-4 p-4 bg-slate-100 border border-slate-300 inline-block">
+                            <MagnifyingGlassIcon className="h-12 w-12 text-slate-400" />
+                          </div>
+                          <Text size="3" weight="medium" className="text-slate-600 mb-2">
+                            Tidak ada data yang sesuai
+                          </Text>
+                          <Text size="2" className="text-slate-500 mb-4">
+                            Coba ubah kata kunci pencarian
+                          </Text>
+                          <button
+                            onClick={handleClearFilters}
+                            className="px-4 py-2 border border-slate-400 bg-white text-slate-700 hover:bg-slate-50 font-medium"
+                            type="button"
+                          >
+                            Reset Pencarian
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="mb-4 p-4 bg-slate-100 border border-slate-300 inline-block">
+                            <Receipt className="h-12 w-12 text-slate-400" />
+                          </div>
+                          <Text size="3" weight="medium" className="text-slate-600 mb-2">
+                            Belum ada tagihan
+                          </Text>
+                          <Text size="2" className="text-slate-500">
+                            Tambahkan tagihan baru melalui tombol di atas
+                          </Text>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      {/* Custom Scrollbar */}
+      <style>{`
+        .h-full.flex.flex-col.border.border-slate-300 ::-webkit-scrollbar {
+          width: 12px;
+          height: 12px;
+        }
+        .h-full.flex.flex-col.border.border-slate-300 ::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-left: 1px solid #cbd5e1;
+        }
+        .h-full.flex.flex-col.border.border-slate-300 ::-webkit-scrollbar-thumb {
+          background: #94a3b8;
+          border: 2px solid #f1f5f9;
+        }
+        .h-full.flex.flex-col.border.border-slate-300 ::-webkit-scrollbar-thumb:hover {
+          background: #64748b;
+        }
+      `}</style>
     </div>
   )
 }

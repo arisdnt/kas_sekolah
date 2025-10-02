@@ -3,7 +3,7 @@ import { PembayaranTableHeader } from './PembayaranTableHeader'
 import { PembayaranTableRow } from './PembayaranTableRow'
 import { PembayaranEmptyState } from './PembayaranEmptyState'
 
-export function PembayaranTable({ data, onEdit, onDelete, onAdd, selectedItem, onSelectItem }) {
+export function PembayaranTable({ data, isLoading, isRefreshing, onEdit, onDelete, onAdd, onViewDetail, selectedItem, onSelectItem }) {
   const {
     searchQuery,
     setSearchQuery,
@@ -17,7 +17,7 @@ export function PembayaranTable({ data, onEdit, onDelete, onAdd, selectedItem, o
 
   return (
     <div className="h-full flex flex-col">
-      <div className="h-full flex flex-col border border-slate-200/80 bg-white/80 backdrop-blur">
+      <div className="h-full flex flex-col border border-slate-300 bg-white shadow-lg">
         <PembayaranTableHeader
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -69,6 +69,7 @@ export function PembayaranTable({ data, onEdit, onDelete, onAdd, selectedItem, o
                     onSelect={onSelectItem}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    onViewDetail={onViewDetail}
                   />
                 ))}
                 {isEmpty && (

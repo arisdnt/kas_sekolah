@@ -1,0 +1,9 @@
+ipcMain.handle('toggle-fullscreen', () => {
+  if (mainWindow) {
+    if (mainWindow.isFullScreen()) {
+      mainWindow.setFullScreen(false);
+    } else {
+      mainWindow.setFullScreen(true);
+    }
+  }
+});

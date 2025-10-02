@@ -17,7 +17,6 @@ import { EditTagihan } from './pages/Tagihan/EditTagihan'
 import { Pembayaran } from './pages/Pembayaran/index'
 import { CreatePembayaran } from './pages/Pembayaran/CreatePembayaran'
 import { EditPembayaran } from './pages/Pembayaran/EditPembayaran'
-import { RincianPembayaran } from './pages/RincianPembayaran/index'
 import { Pengaturan } from './pages/Pengaturan'
 import { ProtectedShell } from './components/ProtectedShell'
 
@@ -38,7 +37,6 @@ const routes = [
   { path: 'pembayaran', element: <Pembayaran /> },
   { path: 'pembayaran/create', element: <CreatePembayaran /> },
   { path: 'pembayaran/edit/:id', element: <EditPembayaran /> },
-  { path: 'rincian-pembayaran', element: <RincianPembayaran /> },
   { path: 'pengaturan', element: <Pengaturan /> },
 ]
 

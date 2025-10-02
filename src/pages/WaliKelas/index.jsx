@@ -6,8 +6,9 @@ import { AlertCircle } from 'lucide-react'
 import { useWaliKelas } from './hooks/useWaliKelas'
 import { WaliKelasTable } from './components/WaliKelasTable'
 import WaliKelasFormDialog from './components/WaliKelasFormDialog'
-import { DeleteConfirmDialog } from './components/DeleteConfirmDialog'
+import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog'
 import { DetailPanel } from './components/DetailPanel'
+import { WaliKelasDetailModal } from './components/WaliKelasDetailModal'
 
 function WaliKelasContent() {
   const {
@@ -24,6 +25,7 @@ function WaliKelasContent() {
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [currentItem, setCurrentItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
@@ -81,11 +83,17 @@ function WaliKelasContent() {
       setCurrentItem(null)
     }
   }
+
+  const handleViewDetail = (item) => {
+    setSelectedItem(item)
+    setDetailModalOpen(true)
+  }
+
   return (
       <PageLayout>
         <div className="flex flex-col h-full">
         {error ? (
-          <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-4 shrink-0">
+          <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-3 shrink-0">
             <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
             <div>
               <Text size="2" weight="medium" className="text-red-700">
@@ -99,7 +107,7 @@ function WaliKelasContent() {
         ) : null}
 
         {/* Layout 2 Kolom: 75% Tabel | 25% Detail */}
-        <div className="flex gap-4 flex-1 min-h-0">
+        <div className="flex gap-3 flex-1 min-h-0">
           {/* Kolom Kiri: Tabel (75%) */}
           <div className="w-3/4 h-full">
             <WaliKelasTable
@@ -110,6 +118,7 @@ function WaliKelasContent() {
               onDelete={handleOpenDelete}
               onToggleStatus={toggleStatus}
               onAdd={handleOpenCreate}
+              onViewDetail={handleViewDetail}
               selectedItem={selectedItem}
               onSelectItem={setSelectedItem}
             />
@@ -139,6 +148,14 @@ function WaliKelasContent() {
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
         itemName={currentItem?.nama_lengkap || ''}
+        title="Hapus Wali Kelas"
+        description="Apakah Anda yakin ingin menghapus wali kelas"
+      />
+
+      <WaliKelasDetailModal
+        open={detailModalOpen}
+        onOpenChange={setDetailModalOpen}
+        waliKelas={selectedItem}
       />
       </PageLayout>
   )

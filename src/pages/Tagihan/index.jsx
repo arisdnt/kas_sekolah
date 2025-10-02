@@ -1,14 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
- 
+
 import { PageLayout } from '../../layout/PageLayout'
-import { Loader } from '../../components/Loader'
 import { Text } from '@radix-ui/themes'
 import { AlertCircle } from 'lucide-react'
 import { useTagihan } from './hooks/useTagihan'
 import { TagihanTable } from './components/TagihanTable'
-import { DeleteConfirmDialog } from './components/DeleteConfirmDialog'
-import { DetailPanelWithRincian } from './components/DetailPanelWithRincian'
+import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog'
+import { DetailPanel } from './components/DetailPanel'
+import { TagihanDetailModal } from './components/TagihanDetailModal'
 
 function TagihanContent() {
   const navigate = useNavigate()
@@ -21,8 +21,30 @@ function TagihanContent() {
   } = useTagihan()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [currentItem, setCurrentItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
+
+  useEffect(() => {
+    if (!loading && data.length === 0) {
+      setSelectedItem(null)
+      return
+    }
+
+    if (!loading && data.length > 0) {
+      if (!selectedItem) {
+        setSelectedItem(data[0])
+        return
+      }
+
+      const found = data.find((item) => item.id === selectedItem.id)
+      if (found && found !== selectedItem) {
+        setSelectedItem(found)
+      } else if (!found) {
+        setSelectedItem(data[0])
+      }
+    }
+  }, [data, loading, selectedItem])
 
   const handleOpenCreate = () => {
     // Redirect ke halaman create tagihan
@@ -47,17 +69,16 @@ function TagihanContent() {
     }
   }
 
-  const handleRefresh = async () => {
-    window.location.reload()
+  const handleOpenDetail = (item) => {
+    setSelectedItem(item)
+    setDetailModalOpen(true)
   }
-
-  // Hindari loader layar penuh untuk sensasi native; render layout langsung
 
   return (
       <PageLayout>
         <div className="flex flex-col h-full">
         {error ? (
-          <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-4 shrink-0">
+          <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 mb-3 shrink-0">
             <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
             <div>
               <Text size="2" weight="medium" className="text-red-700">
@@ -68,22 +89,27 @@ function TagihanContent() {
           </div>
         ) : null}
 
-        <div className="flex gap-4 flex-1 min-h-0">
+        {/* Layout 2 Kolom: 75% Tabel | 25% Detail */}
+        <div className="flex gap-3 flex-1 min-h-0">
+          {/* Kolom Kiri: Tabel (75%) */}
           <div className="w-3/4 h-full">
             <TagihanTable
               data={data}
+              isLoading={loading}
               onEdit={handleOpenEdit}
               onDelete={handleOpenDelete}
               onAdd={handleOpenCreate}
               selectedItem={selectedItem}
               onSelectItem={setSelectedItem}
+              onViewDetail={handleOpenDetail}
             />
           </div>
 
+          {/* Kolom Kanan: Detail Panel (25%) */}
           <div className="w-1/4 h-full">
-            <DetailPanelWithRincian 
-              selectedItem={selectedItem} 
-              onRefresh={handleRefresh}
+            <DetailPanel
+              selectedItem={selectedItem}
+              isLoading={loading}
             />
           </div>
         </div>
@@ -93,6 +119,15 @@ function TagihanContent() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDelete}
+        itemName={currentItem?.nomor_tagihan || currentItem?.judul || ''}
+        title="Hapus Tagihan"
+        description="Apakah Anda yakin ingin menghapus tagihan"
+      />
+
+      <TagihanDetailModal
+        open={detailModalOpen}
+        onOpenChange={setDetailModalOpen}
+        tagihan={selectedItem}
       />
       </PageLayout>
   )

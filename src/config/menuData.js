@@ -9,7 +9,7 @@ import {
   BadgeDollarSign,
   Receipt,
   Wallet,
-  WalletCards,
+  Info,
 } from 'lucide-react'
 
 export const menuSections = [
@@ -76,10 +76,15 @@ export const menuSections = [
         label: 'Pembayaran',
         href: '/pembayaran',
       },
+    ],
+  },
+  {
+    title: 'Info',
+    items: [
       {
-        icon: WalletCards,
-        label: 'Rincian Pembayaran',
-        href: '/rincian-pembayaran',
+        icon: Info,
+        label: 'About',
+        href: '/about',
       },
     ],
   },

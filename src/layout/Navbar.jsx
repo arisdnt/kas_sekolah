@@ -17,11 +17,12 @@ import {
   HamburgerMenuIcon,
   ChevronDownIcon,
 } from '@radix-ui/react-icons'
-import { User, UserCircle, GraduationCap, Wallet, Minus, Square, X, Maximize2, Maximize, Minimize, RefreshCw } from 'lucide-react'
+import { User, GraduationCap, Wallet, Minus, Square, X, Maximize2, Maximize, Minimize, RefreshCw } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import { menuSections } from '../config/menuData'
+import { AboutModal } from '../components/AboutModal'
 
 // Icon mapping untuk setiap section
 const sectionIcons = {
@@ -34,6 +35,7 @@ const sectionIconColors = {
   'Utama': 'text-blue-300',
   'Akademik': 'text-green-300',
   'Keuangan': 'text-amber-300',
+  'Info': 'text-indigo-300',
 }
 
 export function Navbar({ realtimeStatus = 'disconnected' }) {
@@ -43,6 +45,7 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
   const [isMaximized, setIsMaximized] = useState(false)
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false)
 
   // Check if running in Electron
   const isElectron = window.electronAPI !== undefined
@@ -155,18 +158,33 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
                   const Icon = item.icon
                   const active = isActive(item.href)
                   const iconColor = sectionIconColors[section.title] || 'text-white'
+                  const isAboutMenu = item.href === '/about'
                   
                   return (
                     <div key={section.title} className="flex items-center gap-4">
                       <Button
                         variant="ghost"
                         size="2"
-                        onClick={() => navigate(item.href)}
-                        className={`text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer font-medium ${
-                          active ? 'bg-white/20 text-white' : ''
+                        onClick={() => {
+                          if (item.href === '/about') {
+                            setIsAboutModalOpen(true)
+                          } else {
+                            navigate(item.href)
+                          }
+                        }}
+                        className={`text-white transition-all cursor-pointer font-semibold ${
+                          isAboutMenu 
+                            ? 'bg-gradient-to-r from-cyan-400/25 via-blue-400/25 to-purple-400/25 hover:from-cyan-400/35 hover:via-blue-400/35 hover:to-purple-400/35 border border-cyan-300/40 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30' 
+                            : active 
+                              ? 'bg-white/20 text-white hover:bg-white/10' 
+                              : 'hover:bg-white/10'
                         }`}
+                        style={isAboutMenu ? {
+                          backdropFilter: 'blur(8px)',
+                          WebkitBackdropFilter: 'blur(8px)'
+                        } : {}}
                       >
-                        <Icon className={`h-4 w-4 ${iconColor}`} />
+                        <Icon className={`h-4 w-4 ${isAboutMenu ? 'text-cyan-200' : iconColor}`} />
                         {item.label}
                       </Button>
                       {index < menuSections.length - 1 && (
@@ -246,29 +264,27 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
 
             {/* Refresh Button */}
             <Tooltip content="Refresh Data">
-              <IconButton
-                variant="ghost"
-                size="2"
+              <button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
-                className="text-white/80 hover:text-white hover:bg-white/10"
+                className="h-8 w-8 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                type="button"
               >
                 <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              </IconButton>
+              </button>
             </Tooltip>
 
             {/* Notifications */}
             <Tooltip content="Notifications">
-              <IconButton
-                variant="ghost"
-                size="2"
-                className="text-white/80 hover:text-white hover:bg-white/10 relative"
+              <button
+                className="h-8 w-8 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors relative"
+                type="button"
               >
-                <BellIcon />
-                <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center">
+                <BellIcon className="h-4 w-4" />
+                <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 text-[10px] text-white flex items-center justify-center font-semibold">
                   3
                 </div>
-              </IconButton>
+              </button>
             </Tooltip>
 
             {/* Separator */}
@@ -277,17 +293,9 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
             {/* User Menu */}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger>
-                <Button variant="ghost" className="flex items-center space-x-3 hover:bg-white/10 p-2 rounded-lg">
-                  <UserCircle className="h-8 w-8 text-white" />
-                  <div className="hidden sm:block text-left">
-                    <Text size="2" weight="medium" className="text-white block">
-                      {user?.email?.split('@')[0] || 'User'}
-                    </Text>
-                    <Text size="1" className="text-white/70 block">
-                      Administrator
-                    </Text>
-                  </div>
-                </Button>
+                <button className="h-8 w-8 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors" type="button">
+                  <User className="h-4 w-4" />
+                </button>
               </DropdownMenu.Trigger>
 
               <DropdownMenu.Content className="w-56 mt-2" align="end">
@@ -323,13 +331,9 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
 
             {/* Mobile menu button */}
             <div className="md:hidden">
-              <IconButton
-                variant="ghost"
-                size="2"
-                className="text-white/80 hover:text-white hover:bg-white/10"
-              >
-                <HamburgerMenuIcon />
-              </IconButton>
+              <button className="h-8 w-8 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 transition-colors" type="button">
+                <HamburgerMenuIcon className="h-4 w-4" />
+              </button>
             </div>
           </div>
 
@@ -387,6 +391,9 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
           )}
         </div>
       </div>
+
+      {/* About Modal */}
+      <AboutModal open={isAboutModalOpen} onOpenChange={setIsAboutModalOpen} />
     </nav>
   )
 }

@@ -4,13 +4,13 @@ import { JenisPembayaranTableHeader } from './JenisPembayaranTableHeader'
 import { JenisPembayaranTableRow } from './JenisPembayaranTableRow'
 import { JenisPembayaranEmptyState } from './JenisPembayaranEmptyState'
 
-export function JenisPembayaranTable({ data, onEdit, onDelete, onAdd }) {
+export function JenisPembayaranTable({ data, isLoading, isRefreshing, onEdit, onDelete, onAdd, onViewDetail, selectedItem, onSelectItem }) {
   const filters = useJenisPembayaranFilters(data)
   const isEmpty = filters.filteredData.length === 0
 
   return (
     <div className="h-full flex flex-col">
-      <div className="h-full flex flex-col border border-slate-200/80 bg-white/80 backdrop-blur relative">
+      <div className="h-full flex flex-col border border-slate-300 bg-white shadow-lg relative">
         <JenisPembayaranFilters
           searchQuery={filters.searchQuery}
           setSearchQuery={filters.setSearchQuery}
@@ -54,6 +54,9 @@ export function JenisPembayaranTable({ data, onEdit, onDelete, onAdd }) {
                     item={item}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    onViewDetail={onViewDetail}
+                    selectedItem={selectedItem}
+                    onSelectItem={onSelectItem}
                   />
                 ))}
                 {isEmpty && (

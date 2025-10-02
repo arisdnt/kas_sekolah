@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Badge, IconButton, Switch, Text, Button, TextField, Select } from '@radix-ui/themes'
 import { Pencil1Icon, TrashIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
-import { UserCheck, Clock, Plus, X } from 'lucide-react'
+import { UserCheck, Clock, Plus, X, Eye } from 'lucide-react'
 
 function formatDateTime(dateStr) {
   if (!dateStr) return '—'
@@ -25,6 +25,7 @@ export function WaliKelasTable({
   onAdd,
   selectedItem,
   onSelectItem,
+  onViewDetail,
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -79,10 +80,11 @@ export function WaliKelasTable({
 
   return (
     <div className="h-full flex flex-col">
-      <div className="h-full flex flex-col border border-slate-200/80 bg-white/80 backdrop-blur">
-        {/* Header Section - Single Row */}
-        <div className="border-b border-slate-200/80 bg-gradient-to-r from-slate-50 to-white">
-          <div className="flex flex-wrap items-center gap-4 px-6 py-4">
+      {/* Excel-style container with sharp edges and clean borders */}
+      <div className="h-full flex flex-col border border-slate-300 bg-white shadow-lg">
+        {/* Toolbar Section - Excel-inspired ribbon */}
+        <div className="border-b border-slate-300 bg-gradient-to-b from-slate-50 to-slate-100">
+          <div className="flex flex-wrap items-center gap-3 px-4 py-2.5">
             {/* Search */}
             <div className="flex-1 min-w-[240px] max-w-xs">
               <TextField.Root
@@ -137,21 +139,21 @@ export function WaliKelasTable({
               </Button>
             )}
 
-            {/* Stats */}
+            {/* Stats - Excel-style stat cards */}
             <div className="ml-auto flex items-center gap-2 text-xs">
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-slate-200">
-                <span className="text-slate-500">Total:</span>
-                <span className="font-semibold text-slate-900">{stats.total}</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 shadow-sm">
+                <span className="text-slate-600 font-medium">Total:</span>
+                <span className="font-bold text-slate-900">{stats.total}</span>
               </div>
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 border border-emerald-200">
-                <span className="inline-flex h-1.5 w-1.5 bg-emerald-500" />
-                <span className="text-emerald-700">Aktif:</span>
-                <span className="font-semibold text-emerald-900">{stats.active}</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-300 shadow-sm">
+                <span className="inline-flex h-2 w-2 rounded-full bg-green-500" />
+                <span className="text-green-700 font-medium">Aktif:</span>
+                <span className="font-bold text-green-900">{stats.active}</span>
               </div>
               {hasActiveFilters && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 border border-blue-200">
-                  <span className="text-blue-700">Ditampilkan:</span>
-                  <span className="font-semibold text-blue-900">{stats.filtered}</span>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-300 shadow-sm">
+                  <span className="text-blue-700 font-medium">Filter:</span>
+                  <span className="font-bold text-blue-900">{stats.filtered}</span>
                 </div>
               )}
             </div>
@@ -187,26 +189,26 @@ export function WaliKelasTable({
                 <col style={{ width: '5%' }} />
               </colgroup>
               <thead>
-                <tr className="bg-white/95 backdrop-blur sticky top-0 z-10 border-b border-slate-200">
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                <tr className="bg-gradient-to-b from-slate-100 to-slate-50 sticky top-0 z-10 border-b border-slate-300 shadow-sm">
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Nama Lengkap
                   </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     NIP
                   </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     No. Telepon
                   </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Diperbarui
                   </th>
-                  <th className="px-6 py-3 text-right text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <th className="px-4 py-3 text-center text-[0.7rem] font-bold uppercase tracking-wider text-slate-700">
                     Aksi
                   </th>
                 </tr>
@@ -214,30 +216,30 @@ export function WaliKelasTable({
               <tbody className="divide-y divide-slate-100">
                 {isLoading
                   ? Array.from({ length: 6 }).map((_, index) => (
-                      <tr key={`wali-skeleton-${index}`} className="animate-pulse">
-                        <td className="px-6 py-4 align-middle">
+                      <tr key={`wali-skeleton-${index}`} className="border-b border-slate-200 bg-white">
+                        <td className="px-4 py-3 border-r border-slate-200">
                           <div className="space-y-2">
                             <div className="h-4 w-48 bg-slate-200" />
                             <div className="h-3 w-24 bg-slate-200" />
                           </div>
                         </td>
-                        <td className="px-6 py-4 align-middle">
+                        <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-4 w-32 bg-slate-200" />
                         </td>
-                        <td className="px-6 py-4 align-middle">
+                        <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-4 w-32 bg-slate-200" />
                         </td>
-                        <td className="px-6 py-4 align-middle">
+                        <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-4 w-40 bg-slate-200" />
                         </td>
-                        <td className="px-6 py-4 align-middle">
+                        <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-6 w-24 bg-slate-200" />
                         </td>
-                        <td className="px-6 py-4 align-middle">
-                          <div className="h-3 w-32 bg-slate-200" />
+                        <td className="px-4 py-3 border-r border-slate-200">
+                          <div className="h-3 w-28 bg-slate-200" />
                         </td>
-                        <td className="px-6 py-4 align-middle">
-                          <div className="ml-auto h-6 w-20 bg-slate-200" />
+                        <td className="px-4 py-3 text-center">
+                          <div className="h-6 w-20 bg-slate-200 mx-auto" />
                         </td>
                       </tr>
                     ))
@@ -245,39 +247,39 @@ export function WaliKelasTable({
                   <tr
                     key={item.id}
                     onClick={() => onSelectItem(item)}
-                    className={`group transition-colors cursor-pointer ${
+                    className={`group cursor-pointer border-b border-slate-200 ${
                       selectedItem?.id === item.id
-                        ? 'bg-blue-50 hover:bg-blue-100'
-                        : 'hover:bg-indigo-50/40'
+                        ? 'bg-blue-100 border-l-4 border-l-blue-600'
+                        : 'bg-white hover:bg-blue-50'
                     }`}
                   >
-                    <td className="px-6 py-4 align-middle">
-                      <div className="flex flex-col gap-1">
-                        <Text size="3" weight="medium" className="text-slate-900">
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <div className="flex flex-col gap-0.5">
+                        <Text size="2" weight="medium" className="text-slate-900 font-sans">
                           {item.nama_lengkap}
                         </Text>
-                        <Text size="1" className="text-slate-500 uppercase tracking-wider">
+                        <Text size="1" className="text-slate-500 uppercase tracking-wide font-mono text-[0.65rem]">
                           ID: {item.id?.slice(0, 8) ?? '—'}
                         </Text>
                       </div>
                     </td>
-                    <td className="px-6 py-4 align-middle">
-                      <Text size="2" className="text-slate-700 font-mono">
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" className="text-slate-700 font-mono font-medium">
                         {item.nip || '—'}
                       </Text>
                     </td>
-                    <td className="px-6 py-4 align-middle">
-                      <Text size="2" className="text-slate-700">
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" className="text-slate-700 font-sans">
                         {item.nomor_telepon || '—'}
                       </Text>
                     </td>
-                    <td className="px-6 py-4 align-middle">
-                      <Text size="2" className="text-slate-700">
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" className="text-slate-700 font-sans">
                         {item.email || '—'}
                       </Text>
                     </td>
-                    <td className="px-6 py-4 align-middle">
-                      <div className="flex items-center gap-3">
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <div className="flex items-center gap-2.5">
                         <Switch
                           checked={item.status_aktif}
                           onCheckedChange={() => onToggleStatus(item)}
@@ -286,44 +288,52 @@ export function WaliKelasTable({
                         <Badge
                           variant="soft"
                           color={item.status_aktif ? 'green' : 'gray'}
-                          className="text-xs"
+                          className="text-xs px-2 py-0.5"
                         >
                           {item.status_aktif ? 'Aktif' : 'Nonaktif'}
                         </Badge>
                       </div>
                     </td>
-                    <td className="px-6 py-4 align-middle">
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <Clock className="h-4 w-4 text-slate-400" />
-                        <span className="text-sm">{formatDateTime(item.diperbarui_pada || item.dibuat_pada)}</span>
-                      </div>
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="1" className="text-slate-500 font-mono text-[0.7rem]">
+                        {formatDateTime(item.diperbarui_pada || item.dibuat_pada)}
+                      </Text>
                     </td>
-                    <td className="px-6 py-4 align-middle">
-                      <div className="flex justify-end gap-2">
-                        <IconButton
-                          size="1"
-                          variant="ghost"
+                    <td className="px-4 py-3 border-r border-slate-200 text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onViewDetail(item)
+                          }}
+                          className="p-1.5 hover:bg-blue-100 text-blue-600 transition-colors border border-transparent hover:border-blue-300"
+                          aria-label={`Lihat ${item.nama_lengkap}`}
+                          title="Lihat Detail"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                        </button>
+                        <button
                           onClick={(e) => {
                             e.stopPropagation()
                             onEdit(item)
                           }}
-                          className="cursor-pointer hover:bg-blue-50 text-blue-600"
+                          className="p-1.5 hover:bg-amber-100 text-amber-600 transition-colors border border-transparent hover:border-amber-300"
                           aria-label={`Edit ${item.nama_lengkap}`}
+                          title="Edit"
                         >
-                          <Pencil1Icon />
-                        </IconButton>
-                        <IconButton
-                          size="1"
-                          variant="ghost"
+                          <Pencil1Icon className="h-3.5 w-3.5" />
+                        </button>
+                        <button
                           onClick={(e) => {
                             e.stopPropagation()
                             onDelete(item)
                           }}
-                          className="cursor-pointer hover:bg-red-50 text-red-600"
+                          className="p-1.5 hover:bg-red-100 text-red-600 transition-colors border border-transparent hover:border-red-300"
                           aria-label={`Hapus ${item.nama_lengkap}`}
+                          title="Hapus"
                         >
-                          <TrashIcon />
-                        </IconButton>
+                          <TrashIcon className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>

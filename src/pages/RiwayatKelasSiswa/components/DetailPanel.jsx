@@ -1,196 +1,113 @@
-import { Text, Badge } from '@radix-ui/themes'
-import { BookOpen, Clock, Calendar } from 'lucide-react'
+import { RiwayatDetailInfo } from './RiwayatDetailInfo'
+import { Text } from '@radix-ui/themes'
+import { BookOpen } from 'lucide-react'
 
-function formatDateTime(dateStr) {
-  if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleString('id-ID', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Asia/Jakarta',
-  })
+function RiwayatDetailSkeleton() {
+  return (
+    <div className="relative flex h-full flex-col border border-slate-300 bg-white shadow-lg">
+      {/* Header */}
+      <div className="border-b border-slate-300 bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-4 w-4 text-slate-600" />
+          <Text size="2" weight="bold" className="text-slate-700 uppercase tracking-wider">
+            Detail Riwayat Kelas
+          </Text>
+        </div>
+      </div>
+
+      {/* Content Skeleton */}
+      <div className="flex-1 p-4 space-y-0">
+        {/* Nama section */}
+        <div className="bg-slate-100 border border-slate-200 p-3 mb-3">
+          <div className="h-3 w-20 bg-slate-200 mb-2" />
+          <div className="h-5 w-40 bg-slate-200" />
+        </div>
+
+        {/* Fields */}
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="border-b border-slate-200 pb-3 mb-3">
+            <div className="flex items-center gap-1.5 mb-2">
+              <div className="h-3.5 w-3.5 bg-slate-200" />
+              <div className="h-3 w-24 bg-slate-200" />
+            </div>
+            <div className="ml-5">
+              <div className="h-4 w-32 bg-slate-200" />
+            </div>
+          </div>
+        ))}
+
+        {/* Metadata section */}
+        <div className="pt-3 mt-3 border-t-2 border-slate-300 space-y-3">
+          <div className="pb-2">
+            <div className="flex items-center gap-1.5 mb-2">
+              <div className="h-3.5 w-3.5 bg-slate-200" />
+              <div className="h-3 w-20 bg-slate-200" />
+            </div>
+            <div className="ml-5">
+              <div className="h-3 w-36 bg-slate-200" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleDateString('id-ID', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'Asia/Jakarta',
-  })
-}
+function RiwayatDetailEmpty() {
+  return (
+    <div className="flex h-full flex-col border border-slate-300 bg-white shadow-lg">
+      {/* Header */}
+      <div className="border-b border-slate-300 bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-4 w-4 text-slate-600" />
+          <Text size="2" weight="bold" className="text-slate-700 uppercase tracking-wider">
+            Detail Riwayat Kelas
+          </Text>
+        </div>
+      </div>
 
-function getStatusBadgeColor(status) {
-  switch (status) {
-    case 'aktif': return 'green'
-    case 'pindah_kelas': return 'blue'
-    case 'lulus': return 'purple'
-    case 'keluar': return 'gray'
-    default: return 'gray'
-  }
-}
-
-function getStatusLabel(status) {
-  switch (status) {
-    case 'aktif': return 'Aktif'
-    case 'pindah_kelas': return 'Pindah Kelas'
-    case 'lulus': return 'Lulus'
-    case 'keluar': return 'Keluar'
-    default: return status
-  }
-}
-
-export function DetailPanel({ selectedItem }) {
-  if (!selectedItem) {
-    return (
-      <div className="h-full flex flex-col border border-slate-200/80 bg-white/80 backdrop-blur items-center justify-center p-6">
-        <div className="text-center text-slate-400">
-          <BookOpen className="h-16 w-16 mx-auto mb-4 text-slate-300" />
-          <Text size="3" className="text-slate-500 mb-2">
+      {/* Empty State */}
+      <div className="flex-1 flex items-center justify-center p-6">
+        <div className="text-center">
+          <div className="mb-4 p-4 bg-slate-100 border border-slate-300 inline-block">
+            <BookOpen className="h-12 w-12 text-slate-400" />
+          </div>
+          <Text size="3" weight="medium" className="text-slate-600 mb-2 block">
             Tidak ada data dipilih
           </Text>
-          <Text size="2" className="text-slate-400">
+          <Text size="2" className="text-slate-500">
             Pilih baris pada tabel untuk melihat detail
           </Text>
         </div>
       </div>
-    )
+    </div>
+  )
+}
+
+export function DetailPanel({ selectedItem, isLoading = false, isRefreshing = false }) {
+  if (isLoading) {
+    return <RiwayatDetailSkeleton />
+  }
+
+  if (!selectedItem) {
+    return <RiwayatDetailEmpty />
   }
 
   return (
-    <div className="h-full flex flex-col border border-slate-200/80 bg-white/80 backdrop-blur">
-      <div className="flex-1 overflow-auto p-6">
-        <div className="space-y-6">
-          {/* Status */}
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-              Status Riwayat
-            </Text>
-            <Badge
-              variant="soft"
-              color={getStatusBadgeColor(selectedItem.status)}
-              size="3"
-            >
-              {getStatusLabel(selectedItem.status)}
-            </Badge>
-          </div>
-
-          {/* Siswa */}
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-              Siswa
-            </Text>
-            <Text size="4" weight="bold" className="text-slate-900">
-              {selectedItem.siswa?.nama_lengkap || '—'}
-            </Text>
-            {selectedItem.siswa?.nisn && (
-              <Text size="2" className="text-slate-500 mt-1">
-                NISN: {selectedItem.siswa.nisn}
-              </Text>
-            )}
-          </div>
-
-          {/* Kelas */}
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-              Kelas
-            </Text>
-            <Text size="3" weight="medium" className="text-slate-900">
-              {selectedItem.kelas ? `${selectedItem.kelas.tingkat} ${selectedItem.kelas.nama_sub_kelas}` : '—'}
-            </Text>
-          </div>
-
-          {/* Tahun Ajaran */}
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-              Tahun Ajaran
-            </Text>
-            <Text size="3" weight="medium" className="text-slate-900">
-              {selectedItem.tahun_ajaran?.nama || '—'}
-            </Text>
-          </div>
-
-          {/* Tanggal Masuk */}
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-              Tanggal Masuk
-            </Text>
-            <div className="flex items-center gap-2 text-slate-700">
-              <Calendar className="h-4 w-4 text-slate-400" />
-              <Text size="3" weight="medium">
-                {formatDate(selectedItem.tanggal_masuk)}
-              </Text>
-            </div>
-          </div>
-
-          {/* Tanggal Keluar */}
-          {selectedItem.tanggal_keluar && (
-            <div>
-              <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-                Tanggal Keluar
-              </Text>
-              <div className="flex items-center gap-2 text-slate-700">
-                <Calendar className="h-4 w-4 text-slate-400" />
-                <Text size="3" weight="medium">
-                  {formatDate(selectedItem.tanggal_keluar)}
-                </Text>
-              </div>
-            </div>
-          )}
-
-          {/* Catatan */}
-          {selectedItem.catatan && (
-            <div>
-              <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-                Catatan
-              </Text>
-              <Text size="2" className="text-slate-700 leading-relaxed">
-                {selectedItem.catatan}
-              </Text>
-            </div>
-          )}
-
-          {/* ID */}
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-              ID
-            </Text>
-            <Text size="2" className="text-slate-700 font-mono bg-slate-50 px-3 py-2 border border-slate-200">
-              {selectedItem.id}
-            </Text>
-          </div>
-
-          {/* Dibuat */}
-          <div>
-            <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-              Dibuat Pada
-            </Text>
-            <div className="flex items-center gap-2 text-slate-600">
-              <Clock className="h-4 w-4 text-slate-400" />
-              <Text size="2">
-                {formatDateTime(selectedItem.dibuat_pada)}
-              </Text>
-            </div>
-          </div>
-
-          {/* Diperbarui */}
-          {selectedItem.diperbarui_pada && (
-            <div>
-              <Text size="1" className="text-slate-500 uppercase tracking-wider mb-2 block">
-                Terakhir Diperbarui
-              </Text>
-              <div className="flex items-center gap-2 text-slate-600">
-                <Clock className="h-4 w-4 text-slate-400" />
-                <Text size="2">
-                  {formatDateTime(selectedItem.diperbarui_pada)}
-                </Text>
-              </div>
-            </div>
-          )}
+    <div className="relative flex h-full flex-col border border-slate-300 bg-white shadow-lg">
+      {/* Header - Excel style */}
+      <div className="border-b border-slate-300 bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-4 w-4 text-slate-600" />
+          <Text size="2" weight="bold" className="text-slate-700 uppercase tracking-wider">
+            Detail Riwayat Kelas
+          </Text>
         </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-auto p-4">
+        <RiwayatDetailInfo riwayat={selectedItem} />
       </div>
     </div>
   )
