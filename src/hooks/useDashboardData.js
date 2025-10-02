@@ -310,24 +310,24 @@ function processChartData(rincianPembayaran, tagihan) {
 
 function getPembayaranPerBulan(data) {
   const months = {}
-  const now = new Date()
-  
-  // Init 6 bulan terakhir
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-    months[key] = { month: key, total: 0 }
-  }
 
+  // Kumpulkan semua pembayaran verified
   data?.filter(r => r.status === 'verified').forEach(r => {
     const date = new Date(r.tanggal_bayar)
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-    if (months[key]) {
-      months[key].total += parseFloat(r.jumlah_dibayar || 0)
+    if (!months[key]) {
+      months[key] = { month: key, total: 0 }
     }
+    months[key].total += parseFloat(r.jumlah_dibayar || 0)
   })
 
-  return Object.values(months)
+  // Jika tidak ada data, return array kosong
+  if (Object.keys(months).length === 0) {
+    return []
+  }
+
+  // Sort by month key
+  return Object.values(months).sort((a, b) => a.month.localeCompare(b.month))
 }
 
 function getStatusPembayaran(data) {

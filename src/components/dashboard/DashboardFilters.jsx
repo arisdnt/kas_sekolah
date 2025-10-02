@@ -24,6 +24,16 @@ export function DashboardFilters({
   selectedTimeRange,
   onTimeRangeChange
 }) {
+  console.log('DashboardFilters render:', {
+    tahunAjaranList: tahunAjaranList?.length,
+    kelasList: kelasList?.length,
+    tingkatList: tingkatList?.length,
+    selectedTahunAjaran,
+    selectedTingkat,
+    selectedKelas,
+    selectedTimeRange
+  })
+
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-2">
@@ -36,10 +46,13 @@ export function DashboardFilters({
       {/* Tahun Ajaran */}
       <div className="flex items-center gap-2">
         <BookOpen className="h-3.5 w-3.5 text-blue-500" />
-        <Select.Root value={selectedTahunAjaran} onValueChange={onTahunAjaranChange}>
-          <Select.Trigger style={{ borderRadius: 0 }} className="w-[200px]" placeholder="Tahun Ajaran" />
+        <Select.Root
+          value={selectedTahunAjaran || undefined}
+          onValueChange={(value) => onTahunAjaranChange(value === '__all__' ? '' : value)}
+        >
+          <Select.Trigger style={{ borderRadius: 0, width: '200px' }} placeholder="Tahun Ajaran" />
           <Select.Content style={{ borderRadius: 0 }}>
-            <Select.Item value="">Semua Tahun Ajaran</Select.Item>
+            <Select.Item value="__all__">Semua Tahun Ajaran</Select.Item>
             {tahunAjaranList.map(ta => (
               <Select.Item key={ta.id} value={ta.id}>
                 {ta.nama} {ta.status_aktif && '(Aktif)'}
@@ -52,18 +65,17 @@ export function DashboardFilters({
       {/* Tingkat */}
       <div className="flex items-center gap-2">
         <GraduationCap className="h-3.5 w-3.5 text-indigo-500" />
-        <Select.Root 
-          value={selectedTingkat} 
-          onValueChange={onTingkatChange}
+        <Select.Root
+          value={selectedTingkat || undefined}
+          onValueChange={(value) => onTingkatChange(value === '__all__' ? '' : value)}
           disabled={!selectedTahunAjaran}
         >
-          <Select.Trigger 
-            style={{ borderRadius: 0 }} 
-            className="w-[150px]" 
+          <Select.Trigger
+            style={{ borderRadius: 0, width: '150px' }}
             placeholder={selectedTahunAjaran ? "Tingkat" : "Pilih tahun ajaran"}
           />
           <Select.Content style={{ borderRadius: 0 }}>
-            <Select.Item value="">Semua Tingkat</Select.Item>
+            <Select.Item value="__all__">Semua Tingkat</Select.Item>
             {tingkatList.map(t => (
               <Select.Item key={t} value={t}>Tingkat {t}</Select.Item>
             ))}
@@ -75,17 +87,16 @@ export function DashboardFilters({
       <div className="flex items-center gap-2">
         <GraduationCap className="h-3.5 w-3.5 text-purple-500" />
         <Select.Root
-          value={selectedKelas}
-          onValueChange={onKelasChange}
+          value={selectedKelas || undefined}
+          onValueChange={(value) => onKelasChange(value === '__all__' ? '' : value)}
           disabled={!selectedTingkat}
         >
           <Select.Trigger
-            style={{ borderRadius: 0 }}
-            className="w-[150px]"
+            style={{ borderRadius: 0, width: '150px' }}
             placeholder={selectedTingkat ? "Kelas" : "Pilih tingkat"}
           />
           <Select.Content style={{ borderRadius: 0 }}>
-            <Select.Item value="">Semua Kelas</Select.Item>
+            <Select.Item value="__all__">Semua Kelas</Select.Item>
             {kelasList
               .filter(k => !selectedTingkat || k.tingkat === selectedTingkat)
               .map(k => (
@@ -101,7 +112,7 @@ export function DashboardFilters({
       <div className="flex items-center gap-2 border-l border-slate-300 pl-3 ml-3">
         <Calendar className="h-3.5 w-3.5 text-green-500" />
         <Select.Root value={selectedTimeRange} onValueChange={onTimeRangeChange}>
-          <Select.Trigger style={{ borderRadius: 0 }} className="w-[180px]" placeholder="Periode Waktu" />
+          <Select.Trigger style={{ borderRadius: 0, width: '180px' }} placeholder="Periode Waktu" />
           <Select.Content style={{ borderRadius: 0 }}>
             {TIME_RANGES.map(range => (
               <Select.Item key={range.value} value={range.value}>
