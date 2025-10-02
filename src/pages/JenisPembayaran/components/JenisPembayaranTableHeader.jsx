@@ -18,7 +18,7 @@ export function JenisPembayaranTableHeader() {
           Tahun Ajaran
         </th>
         <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
-          Kelas
+          Tingkat
         </th>
         <th className="px-6 py-3 text-left text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
           Wajib

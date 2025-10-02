@@ -122,6 +122,7 @@ function RiwayatWaliKelasContent() {
               selectedItem={selectedItem}
               onSelectItem={setSelectedItem}
               onViewDetail={handleOpenDetail}
+              tahunAjaranList={tahunAjaranList}
             />
           </div>
 

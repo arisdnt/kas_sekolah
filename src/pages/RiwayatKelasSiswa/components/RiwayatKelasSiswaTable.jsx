@@ -45,6 +45,18 @@ function getStatusLabel(status) {
   }
 }
 
+function getWaliKelasName(kelas, tahunAjaranId) {
+  if (!kelas?.riwayat_wali_kelas || !Array.isArray(kelas.riwayat_wali_kelas)) {
+    return '—'
+  }
+  
+  const activeWaliKelas = kelas.riwayat_wali_kelas.find(
+    rwk => rwk.id_tahun_ajaran === tahunAjaranId && rwk.status === 'aktif'
+  )
+  
+  return activeWaliKelas?.wali_kelas?.nama_lengkap || '—'
+}
+
 export function RiwayatKelasSiswaTable({
   data,
   isLoading = false,
@@ -223,14 +235,15 @@ export function RiwayatKelasSiswaTable({
           <div className="h-full overflow-auto excel-scrollbar">
             <table className="min-w-full table-fixed text-sm border-collapse">
               <colgroup>{[
-                <col key="col-1" style={{ width: '20%' }} />,
-                <col key="col-2" style={{ width: '15%' }} />,
-                <col key="col-3" style={{ width: '15%' }} />,
+                <col key="col-1" style={{ width: '18%' }} />,
+                <col key="col-2" style={{ width: '12%' }} />,
+                <col key="col-3" style={{ width: '12%' }} />,
                 <col key="col-4" style={{ width: '12%' }} />,
-                <col key="col-5" style={{ width: '12%' }} />,
+                <col key="col-5" style={{ width: '10%' }} />,
                 <col key="col-6" style={{ width: '10%' }} />,
                 <col key="col-7" style={{ width: '10%' }} />,
-                <col key="col-8" style={{ width: '6%' }} />,
+                <col key="col-8" style={{ width: '10%' }} />,
+                <col key="col-9" style={{ width: '6%' }} />,
               ]}</colgroup>
               <thead>
                 {/* Excel-style header with freeze pane effect */}
@@ -245,6 +258,9 @@ export function RiwayatKelasSiswaTable({
                   </th>
                   <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Tahun Ajaran
+                  </th>
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
+                    Wali Kelas
                   </th>
                   <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Tgl Masuk
@@ -278,6 +294,9 @@ export function RiwayatKelasSiswaTable({
                         </td>
                         <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-4 w-28 bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3 border-r border-slate-200">
+                          <div className="h-4 w-32 bg-slate-200" />
                         </td>
                         <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-4 w-24 bg-slate-200" />
@@ -326,6 +345,11 @@ export function RiwayatKelasSiswaTable({
                     <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" className="text-slate-700 font-sans">
                         {item.tahun_ajaran?.nama || '—'}
+                      </Text>
+                    </td>
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" className="text-slate-700 font-sans">
+                        {getWaliKelasName(item.kelas, item.id_tahun_ajaran)}
                       </Text>
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">
@@ -401,7 +425,7 @@ export function RiwayatKelasSiswaTable({
                   ))}
                 {isEmpty ? (
                   <tr>
-                    <td colSpan={8} className="relative border-r-0">
+                    <td colSpan={9} className="relative border-r-0">
                       <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400 bg-slate-50">
                         {hasActiveFilters ? (
                           <>

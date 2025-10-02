@@ -30,9 +30,13 @@ export function TagihanTable({
   onAdd,
   selectedItem,
   onSelectItem,
-  onViewDetail
+  onViewDetail,
+  kelasList = [],
+  tahunAjaranList = [],
 }) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [filterTahunAjaran, setFilterTahunAjaran] = useState('all')
+  const [filterKelas, setFilterKelas] = useState('all')
 
   const filteredData = useMemo(() => {
     let filtered = [...data]
@@ -47,8 +51,20 @@ export function TagihanTable({
       )
     }
 
+    if (filterTahunAjaran !== 'all') {
+      filtered = filtered.filter(
+        (item) => item.riwayat_kelas_siswa?.tahun_ajaran?.id === filterTahunAjaran
+      )
+    }
+
+    if (filterKelas !== 'all') {
+      filtered = filtered.filter(
+        (item) => item.riwayat_kelas_siswa?.kelas?.id === filterKelas
+      )
+    }
+
     return filtered
-  }, [data, searchQuery])
+  }, [data, searchQuery, filterTahunAjaran, filterKelas])
 
   const stats = useMemo(() => {
     const total = data.length
@@ -58,10 +74,13 @@ export function TagihanTable({
   }, [data, filteredData])
 
   const isEmpty = filteredData.length === 0
-  const hasActiveFilters = searchQuery.trim()
+  const hasActiveFilters =
+    searchQuery.trim() || filterTahunAjaran !== 'all' || filterKelas !== 'all'
 
   const handleClearFilters = () => {
     setSearchQuery('')
+    setFilterTahunAjaran('all')
+    setFilterKelas('all')
   }
 
   return (
@@ -95,6 +114,45 @@ export function TagihanTable({
               )}
             </TextField.Root>
           </div>
+
+          {/* Filter Tahun Ajaran */}
+          <Select.Root value={filterTahunAjaran} onValueChange={setFilterTahunAjaran}>
+            <Select.Trigger
+              placeholder="Pilih Tahun Ajaran"
+              style={{ borderRadius: 0, minWidth: '160px' }}
+              className="border border-slate-300 bg-white text-slate-700 cursor-pointer"
+            />
+            <Select.Content style={{ borderRadius: 0 }}>
+              <Select.Item value="all">📅 Semua Tahun Ajaran</Select.Item>
+              {tahunAjaranList.map((tahun) => (
+                <Select.Item key={tahun.id} value={tahun.id}>
+                  {tahun.nama}
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select.Root>
+
+          {/* Filter Kelas */}
+          <Select.Root value={filterKelas} onValueChange={setFilterKelas}>
+            <Select.Trigger
+              placeholder="Pilih Kelas"
+              style={{ borderRadius: 0, minWidth: '140px' }}
+              className="border border-slate-300 bg-white text-slate-700 cursor-pointer"
+            />
+            <Select.Content style={{ borderRadius: 0 }}>
+              <Select.Item value="all">🏫 Semua Kelas</Select.Item>
+              {kelasList.map((kelas) => {
+                const label = [kelas.tingkat, kelas.nama_sub_kelas]
+                  .filter(Boolean)
+                  .join(' ') || 'Tanpa Kelas'
+                return (
+                  <Select.Item key={kelas.id} value={kelas.id}>
+                    {label}
+                  </Select.Item>
+                )
+              })}
+            </Select.Content>
+          </Select.Root>
 
           {/* Stats */}
           <div className="flex items-center gap-2">
@@ -163,7 +221,17 @@ export function TagihanTable({
                 </th>
                 <th className="px-4 py-3 text-left border-r border-slate-200">
                   <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
-                    Total
+                    Total Tagihan
+                  </Text>
+                </th>
+                <th className="px-4 py-3 text-left border-r border-slate-200">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
+                    Dibayar
+                  </Text>
+                </th>
+                <th className="px-4 py-3 text-left border-r border-slate-200">
+                  <Text size="1" weight="bold" className="text-slate-700 uppercase tracking-wider">
+                    Kekurangan
                   </Text>
                 </th>
                 <th className="px-4 py-3 text-left border-r border-slate-200">
@@ -233,13 +301,28 @@ export function TagihanTable({
                       </Text>
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">
-                      <Text size="2" weight="bold" className="text-emerald-700">
+                      <Text size="2" weight="bold" className="text-slate-900">
                         {formatCurrency(item.total_tagihan)}
                       </Text>
                       {item.rincian_tagihan && item.rincian_tagihan.length > 0 && (
                         <Text size="1" className="text-slate-500">
                           {item.rincian_tagihan.length} item
                         </Text>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" weight="bold" className="text-green-700">
+                        {formatCurrency(item.total_dibayar || 0)}
+                      </Text>
+                    </td>
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" weight="bold" className={item.kekurangan > 0 ? "text-red-600" : "text-green-600"}>
+                        {formatCurrency(item.kekurangan || 0)}
+                      </Text>
+                      {item.kekurangan <= 0 && (
+                        <Badge color="green" variant="soft" size="1" style={{ borderRadius: 0 }} className="mt-1">
+                          LUNAS
+                        </Badge>
                       )}
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">

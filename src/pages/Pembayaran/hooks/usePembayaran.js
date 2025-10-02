@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
+import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 export function usePembayaran() {
   const [data, setData] = useState([])
@@ -54,6 +55,9 @@ export function usePembayaran() {
     const result = await fetchData()
     setData(result)
   }, [fetchData])
+
+  const handleAppRefresh = useCallback(() => refreshData(), [refreshData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     let ignore = false

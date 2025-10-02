@@ -52,10 +52,12 @@ export function RiwayatWaliKelasTable({
   onAdd,
   selectedItem,
   onSelectItem,
-  onViewDetail
+  onViewDetail,
+  tahunAjaranList = []
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [filterTahunAjaran, setFilterTahunAjaran] = useState('all')
 
   const filteredData = useMemo(() => {
     let filtered = [...data]
@@ -63,7 +65,7 @@ export function RiwayatWaliKelasTable({
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter((item) =>
-        item.wali_kelas?.nama.toLowerCase().includes(query) ||
+        item.wali_kelas?.nama_lengkap.toLowerCase().includes(query) ||
         item.kelas?.nama_sub_kelas.toLowerCase().includes(query) ||
         item.tahun_ajaran?.nama.toLowerCase().includes(query) ||
         item.id.toLowerCase().includes(query)
@@ -74,8 +76,12 @@ export function RiwayatWaliKelasTable({
       filtered = filtered.filter((item) => item.status === filterStatus)
     }
 
+    if (filterTahunAjaran !== 'all') {
+      filtered = filtered.filter((item) => item.id_tahun_ajaran === filterTahunAjaran)
+    }
+
     return filtered
-  }, [data, searchQuery, filterStatus])
+  }, [data, searchQuery, filterStatus, filterTahunAjaran])
 
   const stats = useMemo(() => {
     const total = data.length
@@ -96,11 +102,12 @@ export function RiwayatWaliKelasTable({
   }, [data, filteredData])
 
   const isEmpty = !isLoading && filteredData.length === 0
-  const hasActiveFilters = searchQuery.trim() || filterStatus !== 'all'
+  const hasActiveFilters = searchQuery.trim() || filterStatus !== 'all' || filterTahunAjaran !== 'all'
 
   const handleClearFilters = () => {
     setSearchQuery('')
     setFilterStatus('all')
+    setFilterTahunAjaran('all')
   }
 
   return (
@@ -157,6 +164,29 @@ export function RiwayatWaliKelasTable({
                   <Select.Item value="aktif">✅ Aktif</Select.Item>
                   <Select.Item value="selesai">○ Selesai</Select.Item>
                   <Select.Item value="diganti">🔄 Diganti</Select.Item>
+                </Select.Content>
+              </Select.Root>
+            </div>
+
+            {/* Filter Tahun Ajaran */}
+            <div className="flex items-center gap-2">
+              <Select.Root value={filterTahunAjaran} onValueChange={setFilterTahunAjaran}>
+                <Select.Trigger
+                  style={{
+                    borderRadius: 0,
+                    minWidth: '160px',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff'
+                  }}
+                  className="cursor-pointer font-sans"
+                />
+                <Select.Content style={{ borderRadius: 0 }}>
+                  <Select.Item value="all">📅 Semua Tahun Ajaran</Select.Item>
+                  {tahunAjaranList.map((tahun) => (
+                    <Select.Item key={tahun.id} value={tahun.id}>
+                      {tahun.nama}
+                    </Select.Item>
+                  ))}
                 </Select.Content>
               </Select.Root>
             </div>
@@ -300,11 +330,17 @@ export function RiwayatWaliKelasTable({
                     <td className="px-4 py-3 border-r border-slate-200">
                       <div className="flex flex-col gap-0.5">
                         <Text size="2" weight="medium" className="text-slate-900 font-sans">
-                          {item.wali_kelas?.nama || '—'}
+                          {item.wali_kelas?.nama_lengkap || '—'}
                         </Text>
-                        <Text size="1" className="text-slate-500 uppercase tracking-wide font-mono text-[0.65rem]">
-                          ID: {item.id?.slice(0, 8) ?? '—'}
-                        </Text>
+                        {item.wali_kelas?.nip ? (
+                          <Text size="1" className="text-red-600 uppercase tracking-wide font-mono text-[0.65rem] font-semibold">
+                            NIP: {item.wali_kelas.nip}
+                          </Text>
+                        ) : (
+                          <Text size="1" className="text-slate-500 uppercase tracking-wide font-mono text-[0.65rem]">
+                            ID: {item.id?.slice(0, 8) ?? '—'}
+                          </Text>
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">
@@ -348,7 +384,7 @@ export function RiwayatWaliKelasTable({
                           }}
                           className="cursor-pointer hover:bg-slate-100 text-slate-700 border border-slate-200"
                           style={{ borderRadius: 0 }}
-                          aria-label={`Detail ${item.wali_kelas?.nama}`}
+                          aria-label={`Detail ${item.wali_kelas?.nama_lengkap}`}
                         >
                           <Eye className="h-3.5 w-3.5" />
                         </IconButton>
@@ -361,7 +397,7 @@ export function RiwayatWaliKelasTable({
                           }}
                           className="cursor-pointer hover:bg-blue-100 text-blue-700 border border-blue-200"
                           style={{ borderRadius: 0 }}
-                          aria-label={`Edit ${item.wali_kelas?.nama}`}
+                          aria-label={`Edit ${item.wali_kelas?.nama_lengkap}`}
                         >
                           <Pencil1Icon />
                         </IconButton>
@@ -374,7 +410,7 @@ export function RiwayatWaliKelasTable({
                           }}
                           className="cursor-pointer hover:bg-red-100 text-red-700 border border-red-200"
                           style={{ borderRadius: 0 }}
-                          aria-label={`Hapus ${item.wali_kelas?.nama}`}
+                          aria-label={`Hapus ${item.wali_kelas?.nama_lengkap}`}
                         >
                           <TrashIcon />
                         </IconButton>

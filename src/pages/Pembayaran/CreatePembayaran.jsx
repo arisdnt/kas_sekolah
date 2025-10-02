@@ -132,7 +132,7 @@ function CreatePembayaranContent() {
             ),
             pembayaran(
               id, nomor_pembayaran,
-              rincian_pembayaran(jumlah_dibayar, status)
+              rincian_pembayaran(jumlah_dibayar)
             )
           `)
           .eq('id_riwayat_kelas_siswa', selectedSiswa)
@@ -154,8 +154,7 @@ function CreatePembayaranContent() {
     const total = tagihan.rincian_tagihan?.reduce((sum, r) => sum + parseFloat(r.jumlah || 0), 0) || 0
     
     const sudahDibayar = tagihan.pembayaran?.reduce((sum, p) => {
-      const verified = p.rincian_pembayaran?.filter(r => r.status === 'verified') || []
-      return sum + verified.reduce((s, r) => s + parseFloat(r.jumlah_dibayar || 0), 0)
+      return sum + (p.rincian_pembayaran?.reduce((s, r) => s + parseFloat(r.jumlah_dibayar || 0), 0) || 0)
     }, 0) || 0
 
     return {
@@ -232,7 +231,6 @@ function CreatePembayaranContent() {
         metode_pembayaran: item.metode_pembayaran,
         referensi_pembayaran: item.referensi_pembayaran || null,
         catatan: item.catatan || null,
-        status: 'pending', // Default status
         cicilan_ke: nextCicilan + index,
       }))
 
@@ -249,15 +247,8 @@ function CreatePembayaranContent() {
     }
   }
 
-  const addRincianItem = () => {
-    setRincianItems([...rincianItems, {
-      nomor_transaksi: '',
-      jumlah_dibayar: '',
-      tanggal_bayar: new Date().toISOString().split('T')[0],
-      metode_pembayaran: '',
-      referensi_pembayaran: '',
-      catatan: '',
-    }])
+  const addRincianItem = (formData) => {
+    setRincianItems([...rincianItems, formData])
   }
 
   const removeRincianItem = (index) => {

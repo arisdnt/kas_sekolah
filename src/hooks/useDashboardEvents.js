@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useAppRefresh } from './useAppRefresh'
 
 let cachedDashboardEvents = null
 
@@ -48,6 +49,9 @@ export function useDashboardEvents() {
       }
     }
   }, [])
+
+  const handleAppRefresh = useCallback(() => loadEvents(), [loadEvents])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     isMountedRef.current = true

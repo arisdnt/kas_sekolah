@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
+import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 export function useRincianTagihan() {
   const [data, setData] = useState([])
@@ -48,6 +49,9 @@ export function useRincianTagihan() {
     const result = await fetchData()
     setData(result)
   }, [fetchData])
+
+  const handleAppRefresh = useCallback(() => refreshData(), [refreshData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     let ignore = false

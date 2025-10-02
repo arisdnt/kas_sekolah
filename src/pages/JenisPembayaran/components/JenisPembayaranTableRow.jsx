@@ -50,7 +50,7 @@ export function JenisPembayaranTableRow({ item, onEdit, onDelete, onViewDetail, 
       </td>
       <td className="px-6 py-4 align-middle">
         <div className="text-[13px] text-slate-700">
-          {item.kelas ? `Kelas ${item.kelas.tingkat}` : '—'}
+          {item.tingkat ? `Kelas ${item.tingkat}` : '—'}
         </div>
       </td>
       <td className="px-6 py-4 align-middle">

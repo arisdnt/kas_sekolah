@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
+import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 export function useJenisPembayaran() {
   const [data, setData] = useState([])
@@ -12,9 +13,8 @@ export function useJenisPembayaran() {
       .from('jenis_pembayaran')
       .select(`
         id, kode, nama, deskripsi, jumlah_default, tipe_pembayaran, wajib,
-        status_aktif, dibuat_pada, diperbarui_pada, id_tahun_ajaran, id_kelas,
-        tahun_ajaran:id_tahun_ajaran(id, nama),
-        kelas:id_kelas(id, tingkat, nama_sub_kelas)
+        status_aktif, dibuat_pada, diperbarui_pada, id_tahun_ajaran, tingkat,
+        tahun_ajaran:id_tahun_ajaran(id, nama)
       `)
       .order('kode')
 
@@ -30,6 +30,9 @@ export function useJenisPembayaran() {
     const result = await fetchData()
     setData(result)
   }, [fetchData])
+
+  const handleAppRefresh = useCallback(() => refreshData(), [refreshData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     let ignore = false
@@ -60,9 +63,8 @@ export function useJenisPembayaran() {
               .from('jenis_pembayaran')
               .select(`
                 id, kode, nama, deskripsi, jumlah_default, tipe_pembayaran, wajib,
-                status_aktif, dibuat_pada, diperbarui_pada, id_tahun_ajaran, id_kelas,
-                tahun_ajaran:id_tahun_ajaran(id, nama),
-                kelas:id_kelas(id, tingkat, nama_sub_kelas)
+                status_aktif, dibuat_pada, diperbarui_pada, id_tahun_ajaran, tingkat,
+                tahun_ajaran:id_tahun_ajaran(id, nama)
               `)
               .order('kode')
 
@@ -108,10 +110,18 @@ export function useJenisPembayaran() {
 
   const saveItem = async (formData, isEdit) => {
     try {
+      // Validasi field wajib
+      if (!formData.id_tahun_ajaran) {
+        throw new Error('Tahun Ajaran wajib dipilih')
+      }
+      if (!formData.tingkat) {
+        throw new Error('Tingkat Kelas wajib dipilih')
+      }
+      if (!formData.tipe_pembayaran) {
+        throw new Error('Tipe Pembayaran wajib dipilih')
+      }
+
       if (isEdit) {
-        if (formData.apply_all_kelas) {
-          throw new Error('Edit dengan lingkup "Semua kelas di tingkat" belum didukung. Silakan buat baru menggunakan opsi tersebut.')
-        }
         const { error: updateError } = await supabase
           .from('jenis_pembayaran')
           .update({
@@ -123,21 +133,16 @@ export function useJenisPembayaran() {
             wajib: formData.wajib,
             status_aktif: formData.status_aktif,
             id_tahun_ajaran: formData.id_tahun_ajaran,
-            id_kelas: formData.id_kelas,
+            tingkat: formData.tingkat,
             diperbarui_pada: new Date().toISOString(),
           })
           .eq('id', formData.id)
 
         if (updateError) throw updateError
       } else {
-        if (formData.apply_all_kelas) {
-          if (!formData.tingkat_for_kelas) throw new Error('Pilih tingkat untuk opsi Semua Kelas.')
-          const { data: kelasByTingkat, error: kelasErr } = await supabase
-            .from('kelas')
-            .select('id')
-            .eq('tingkat', formData.tingkat_for_kelas)
-          if (kelasErr) throw kelasErr
-          const rows = (kelasByTingkat || []).map(k => ({
+        const { error: insertError } = await supabase
+          .from('jenis_pembayaran')
+          .insert({
             kode: formData.kode,
             nama: formData.nama,
             deskripsi: formData.deskripsi || null,
@@ -146,27 +151,9 @@ export function useJenisPembayaran() {
             wajib: formData.wajib,
             status_aktif: formData.status_aktif,
             id_tahun_ajaran: formData.id_tahun_ajaran,
-            id_kelas: k.id,
-          }))
-          if (rows.length === 0) throw new Error('Tidak ada kelas pada tingkat terpilih.')
-          const { error: bulkErr } = await supabase.from('jenis_pembayaran').insert(rows)
-          if (bulkErr) throw bulkErr
-        } else {
-          const { error: insertError } = await supabase
-            .from('jenis_pembayaran')
-            .insert({
-              kode: formData.kode,
-              nama: formData.nama,
-              deskripsi: formData.deskripsi || null,
-              jumlah_default: formData.jumlah_default || null,
-              tipe_pembayaran: formData.tipe_pembayaran,
-              wajib: formData.wajib,
-              status_aktif: formData.status_aktif,
-              id_tahun_ajaran: formData.id_tahun_ajaran,
-              id_kelas: formData.id_kelas,
-            })
-          if (insertError) throw insertError
-        }
+            tingkat: formData.tingkat,
+          })
+        if (insertError) throw insertError
       }
 
       await refreshData()

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Dialog, TextField, Text, Button, Select, Switch, TextArea } from '@radix-ui/themes'
-import { AlertCircle, DollarSign, Edit3, FileText, Hash, Tag, Calendar, GraduationCap, BookOpen, X } from 'lucide-react'
+import { AlertCircle, DollarSign, Edit3, FileText, Hash, Tag, Calendar, GraduationCap, X } from 'lucide-react'
 import { useTahunAjaran } from '../hooks/useTahunAjaran'
 import { useKelas } from '../hooks/useKelas'
 
@@ -12,7 +12,7 @@ export function JenisPembayaranFormDialog({
   isEdit 
 }) {
   const { tahunAjaranList } = useTahunAjaran()
-  const { kelasList, tingkatList, getKelasByTingkat } = useKelas()
+  const { tingkatList } = useKelas()
   const [formData, setFormData] = useState(
     initialData || {
       id: '',
@@ -22,8 +22,7 @@ export function JenisPembayaranFormDialog({
       jumlah_default: '',
       tipe_pembayaran: '',
       id_tahun_ajaran: '',
-      tingkat: '',  // Helper field for UI only
-      id_kelas: '',
+      tingkat: '',
       wajib: true,
       status_aktif: true,
     }
@@ -34,16 +33,9 @@ export function JenisPembayaranFormDialog({
   // Update form when initialData changes
   useEffect(() => {
     if (initialData) {
-      // Find tingkat from kelas if id_kelas is set
-      let tingkat = ''
-      if (initialData.id_kelas) {
-        const kelas = kelasList.find(k => k.id === initialData.id_kelas)
-        if (kelas) tingkat = kelas.tingkat
-      }
-
       setFormData({
         ...initialData,
-        tingkat,  // Set helper field
+        tingkat: initialData.tingkat || '',
         wajib: initialData.wajib ?? true,
         status_aktif: initialData.status_aktif ?? true,
       })
@@ -57,28 +49,44 @@ export function JenisPembayaranFormDialog({
         tipe_pembayaran: '',
         id_tahun_ajaran: '',
         tingkat: '',
-        id_kelas: '',
         wajib: true,
         status_aktif: true,
       })
     }
-  }, [initialData, kelasList])
+  }, [initialData])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
     setError('')
 
+    // Validasi field wajib
     if (!formData.kode || !formData.nama) {
       setError('Kode dan Nama wajib diisi')
       setSubmitting(false)
       return
     }
 
+    if (!formData.id_tahun_ajaran) {
+      setError('Tahun Ajaran wajib dipilih')
+      setSubmitting(false)
+      return
+    }
+
+    if (!formData.tingkat) {
+      setError('Tingkat Kelas wajib dipilih')
+      setSubmitting(false)
+      return
+    }
+
+    if (!formData.tipe_pembayaran) {
+      setError('Tipe Pembayaran wajib dipilih')
+      setSubmitting(false)
+      return
+    }
+
     try {
-      // Remove helper field before submit
-      const { tingkat, ...dataToSubmit } = formData
-      await onSubmit(dataToSubmit, isEdit)
+      await onSubmit(formData, isEdit)
       onOpenChange(false)
       setError('')
     } catch (err) {
@@ -88,17 +96,7 @@ export function JenisPembayaranFormDialog({
     }
   }
 
-  // Handle tingkat change - reset id_kelas
-  const handleTingkatChange = (value) => {
-    setFormData({ 
-      ...formData, 
-      tingkat: value,
-      id_kelas: ''  // Reset kelas when tingkat changes
-    })
-  }
 
-  // Get filtered kelas list based on selected tingkat
-  const filteredKelasList = formData.tingkat ? getKelasByTingkat(formData.tingkat) : []
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -223,11 +221,12 @@ export function JenisPembayaranFormDialog({
               <label>
                 <div className="flex items-center gap-1.5 mb-1">
                   <Calendar className="h-3.5 w-3.5 text-purple-500" />
-                  <Text size="2" weight="medium">Tipe Pembayaran</Text>
+                  <Text size="2" weight="medium">Tipe Pembayaran <span className="text-red-600">*</span></Text>
                 </div>
                 <Select.Root 
                   value={formData.tipe_pembayaran} 
                   onValueChange={(value) => setFormData({ ...formData, tipe_pembayaran: value })}
+                  required
                 >
                   <Select.Trigger style={{ borderRadius: 0, width: '100%' }} placeholder="Pilih tipe" />
                   <Select.Content style={{ borderRadius: 0 }}>
@@ -244,11 +243,12 @@ export function JenisPembayaranFormDialog({
               <label>
                 <div className="flex items-center gap-1.5 mb-1">
                   <Calendar className="h-3.5 w-3.5 text-blue-500" />
-                  <Text size="2" weight="medium">Tahun Ajaran <span className="text-orange-600">*</span></Text>
+                  <Text size="2" weight="medium">Tahun Ajaran <span className="text-red-600">*</span></Text>
                 </div>
                 <Select.Root 
                   value={formData.id_tahun_ajaran} 
                   onValueChange={(value) => setFormData({ ...formData, id_tahun_ajaran: value })}
+                  required
                 >
                   <Select.Trigger style={{ borderRadius: 0, width: '100%' }} placeholder="Pilih tahun ajaran" />
                   <Select.Content style={{ borderRadius: 0 }}>
@@ -259,17 +259,18 @@ export function JenisPembayaranFormDialog({
                     ))}
                   </Select.Content>
                 </Select.Root>
-                <Text size="1" className="text-slate-500 mt-1">Isolasi data per tahun ajaran</Text>
+                <Text size="1" className="text-slate-500 mt-1">Wajib dipilih untuk isolasi data per tahun ajaran</Text>
               </label>
 
               <label>
                 <div className="flex items-center gap-1.5 mb-1">
                   <GraduationCap className="h-3.5 w-3.5 text-indigo-500" />
-                  <Text size="2" weight="medium">Tingkat Kelas <span className="text-orange-600">*</span></Text>
+                  <Text size="2" weight="medium">Tingkat Kelas <span className="text-red-600">*</span></Text>
                 </div>
                 <Select.Root 
                   value={formData.tingkat} 
-                  onValueChange={handleTingkatChange}
+                  onValueChange={(value) => setFormData({ ...formData, tingkat: value })}
+                  required
                 >
                   <Select.Trigger style={{ borderRadius: 0, width: '100%' }} placeholder="Pilih tingkat" />
                   <Select.Content style={{ borderRadius: 0 }}>
@@ -280,38 +281,7 @@ export function JenisPembayaranFormDialog({
                     ))}
                   </Select.Content>
                 </Select.Root>
-                <Text size="1" className="text-slate-500 mt-1">Isolasi data per tingkat kelas</Text>
-              </label>
-            </div>
-
-            {/* Row 5: Kelas Spesifik (Optional) */}
-            <div className="mb-4">
-              <label>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <BookOpen className="h-3.5 w-3.5 text-teal-500" />
-                  <Text size="2" weight="medium">Kelas Spesifik (Opsional)</Text>
-                </div>
-                <Select.Root
-                  value={formData.id_kelas || undefined}
-                  onValueChange={(value) => setFormData({ ...formData, id_kelas: value === '__all__' ? '' : value })}
-                  disabled={!formData.tingkat}
-                >
-                  <Select.Trigger
-                    style={{ borderRadius: 0, width: '100%' }}
-                    placeholder={formData.tingkat ? "Pilih kelas atau kosongkan untuk semua kelas" : "Pilih tingkat terlebih dahulu"}
-                  />
-                  <Select.Content style={{ borderRadius: 0 }}>
-                    <Select.Item value="__all__">Semua Kelas (Tingkat {formData.tingkat})</Select.Item>
-                    {filteredKelasList.map((kelas) => (
-                      <Select.Item key={kelas.id} value={kelas.id}>
-                        Kelas {kelas.tingkat} {kelas.nama_sub_kelas}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Root>
-                <Text size="1" className="text-slate-500 mt-1">
-                  Kosongkan jika berlaku untuk semua kelas di tingkat {formData.tingkat || 'tersebut'}
-                </Text>
+                <Text size="1" className="text-slate-500 mt-1">Berlaku untuk semua kelas di tingkat ini</Text>
               </label>
             </div>
 

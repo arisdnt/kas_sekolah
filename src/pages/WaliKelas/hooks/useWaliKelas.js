@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
+import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 let cachedWaliKelas = null
 
@@ -63,6 +64,9 @@ export function useWaliKelas() {
       }
     }
   }, [fetchData, applyData])
+
+  const handleAppRefresh = useCallback(() => refreshData(), [refreshData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     isMountedRef.current = true

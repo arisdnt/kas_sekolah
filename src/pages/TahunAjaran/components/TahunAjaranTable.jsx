@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Badge, IconButton, Switch, Text, Button, TextField, Select } from '@radix-ui/themes'
 import { Pencil1Icon, TrashIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
-import { Clock, Plus, X, Calendar, Eye } from 'lucide-react'
+import { Clock, Plus, X, Calendar, Eye, Users } from 'lucide-react'
 
 function formatDateTime(dateStr) {
   if (!dateStr) return '—'
@@ -200,12 +200,13 @@ export function TahunAjaranTable({
           <div className="h-full overflow-auto excel-scrollbar">
             <table className="min-w-full table-fixed text-sm border-collapse">
               <colgroup>{[
-                <col key="col-1" style={{ width: '25%' }} />,
-                <col key="col-2" style={{ width: '20%' }} />,
-                <col key="col-3" style={{ width: '20%' }} />,
-                <col key="col-4" style={{ width: '13%' }} />,
-                <col key="col-5" style={{ width: '14%' }} />,
-                <col key="col-6" style={{ width: '8%' }} />,
+                <col key="col-1" style={{ width: '22%' }} />,
+                <col key="col-2" style={{ width: '16%' }} />,
+                <col key="col-3" style={{ width: '16%' }} />,
+                <col key="col-4" style={{ width: '10%' }} />,
+                <col key="col-5" style={{ width: '13%' }} />,
+                <col key="col-6" style={{ width: '15%' }} />,
+                <col key="col-7" style={{ width: '8%' }} />,
               ]}</colgroup>
               <thead>
                 {/* Excel-style header with freeze pane effect */}
@@ -220,6 +221,9 @@ export function TahunAjaranTable({
                   </th>
                   <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Tanggal Selesai
+                  </th>
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
+                    Total Siswa
                   </th>
                   <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Status
@@ -247,6 +251,9 @@ export function TahunAjaranTable({
                         </td>
                         <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-4 w-32 bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3 border-r border-slate-200">
+                          <div className="h-4 w-20 bg-slate-200" />
                         </td>
                         <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-6 w-24 bg-slate-200" />
@@ -290,6 +297,14 @@ export function TahunAjaranTable({
                       <Text size="2" className="text-slate-700 font-sans">
                         {formatDate(item.tanggal_selesai)}
                       </Text>
+                    </td>
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-3.5 w-3.5 text-slate-500 flex-shrink-0" />
+                        <Text size="2" weight="medium" className="text-slate-900 font-mono">
+                          {item.total_siswa || 0}
+                        </Text>
+                      </div>
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">
                       <div className="flex items-center gap-2.5">
@@ -363,7 +378,7 @@ export function TahunAjaranTable({
                   ))}
                 {isEmpty ? (
                   <tr>
-                    <td colSpan={6} className="relative border-r-0">
+                    <td colSpan={7} className="relative border-r-0">
                       <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400 bg-slate-50">
                         {hasActiveFilters ? (
                           <>

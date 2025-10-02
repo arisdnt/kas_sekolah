@@ -28,11 +28,8 @@ export function JenisPembayaranTable({ data, isLoading, isRefreshing, onEdit, on
           setFilterTahunId={filters.setFilterTahunId}
           filterTingkat={filters.filterTingkat}
           setFilterTingkat={filters.setFilterTingkat}
-          filterKelasId={filters.filterKelasId}
-          setFilterKelasId={filters.setFilterKelasId}
           tahunList={filters.tahunList}
           tingkatList={filters.tingkatList}
-          kelasByTingkat={filters.kelasByTingkat}
           hasActiveFilters={filters.hasActiveFilters}
           handleClearFilters={filters.handleClearFilters}
           onAdd={onAdd}

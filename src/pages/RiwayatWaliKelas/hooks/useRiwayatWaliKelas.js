@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
+import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 export function useRiwayatWaliKelas() {
   const [data, setData] = useState([])
@@ -45,6 +46,9 @@ export function useRiwayatWaliKelas() {
     const result = await fetchData()
     setData(result)
   }, [fetchData])
+
+  const handleAppRefresh = useCallback(() => refreshData(), [refreshData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     let ignore = false

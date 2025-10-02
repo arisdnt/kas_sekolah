@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 export function useJenisPembayaranFilters(data) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -6,7 +6,6 @@ export function useJenisPembayaranFilters(data) {
   const [filterStatus, setFilterStatus] = useState('all')
   const [filterTahunId, setFilterTahunId] = useState('all')
   const [filterTingkat, setFilterTingkat] = useState('all')
-  const [filterKelasId, setFilterKelasId] = useState('all')
 
   // Derived lists for filters
   const tahunList = useMemo(() => {
@@ -18,32 +17,9 @@ export function useJenisPembayaranFilters(data) {
     return Array.from(map, ([id, nama]) => ({ id, nama }))
   }, [data])
 
-  const kelasList = useMemo(() => {
-    const map = new Map()
-    for (const item of data) {
-      const k = item.kelas
-      if (k?.id && !map.has(k.id)) {
-        map.set(k.id, { id: k.id, tingkat: k.tingkat, nama_sub_kelas: k.nama_sub_kelas })
-      }
-    }
-    return Array.from(map.values())
-  }, [data])
-
   const tingkatList = useMemo(() => {
-    return Array.from(new Set(kelasList.map(k => k.tingkat))).sort()
-  }, [kelasList])
-
-  const kelasByTingkat = useMemo(() => {
-    const grouped = new Map()
-    for (const k of kelasList) {
-      if (!grouped.has(k.tingkat)) grouped.set(k.tingkat, [])
-      grouped.get(k.tingkat).push(k)
-    }
-    for (const arr of grouped.values()) {
-      arr.sort((a, b) => (a.nama_sub_kelas || '').localeCompare(b.nama_sub_kelas || ''))
-    }
-    return grouped
-  }, [kelasList])
+    return Array.from(new Set(data.map(item => item.tingkat).filter(Boolean))).sort()
+  }, [data])
 
   const filteredData = useMemo(() => {
     let filtered = [...data]
@@ -70,18 +46,15 @@ export function useJenisPembayaranFilters(data) {
       filtered = filtered.filter((item) => item.id_tahun_ajaran === filterTahunId)
     }
     if (filterTingkat !== 'all') {
-      filtered = filtered.filter((item) => item.kelas?.tingkat === filterTingkat)
-    }
-    if (filterKelasId !== 'all') {
-      filtered = filtered.filter((item) => item.id_kelas === filterKelasId)
+      filtered = filtered.filter((item) => item.tingkat === filterTingkat)
     }
 
     return filtered
-  }, [data, searchQuery, filterTipe, filterStatus, filterTahunId, filterTingkat, filterKelasId])
+  }, [data, searchQuery, filterTipe, filterStatus, filterTahunId, filterTingkat])
 
   const hasActiveFilters = searchQuery.trim() || filterTipe !== 'all' || 
     filterStatus !== 'all' || filterTahunId !== 'all' || 
-    filterTingkat !== 'all' || filterKelasId !== 'all'
+    filterTingkat !== 'all'
 
   const handleClearFilters = () => {
     setSearchQuery('')
@@ -89,13 +62,7 @@ export function useJenisPembayaranFilters(data) {
     setFilterStatus('all')
     setFilterTahunId('all')
     setFilterTingkat('all')
-    setFilterKelasId('all')
   }
-
-  // Reset kelas when tingkat changes
-  useEffect(() => {
-    setFilterKelasId('all')
-  }, [filterTingkat])
 
   return {
     searchQuery,
@@ -108,11 +75,8 @@ export function useJenisPembayaranFilters(data) {
     setFilterTahunId,
     filterTingkat,
     setFilterTingkat,
-    filterKelasId,
-    setFilterKelasId,
     tahunList,
     tingkatList,
-    kelasByTingkat,
     filteredData,
     hasActiveFilters,
     handleClearFilters,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Avatar,
   Badge,
@@ -108,17 +108,43 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
     }
   }
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
+    if (isRefreshing) {
+      return
+    }
+
     setIsRefreshing(true)
-    
+
+    const detail = { promises: [] }
+
     // Dispatch custom event untuk trigger refresh di semua components
-    window.dispatchEvent(new CustomEvent('app-refresh'))
-    
-    // Reset refreshing state after 1 second
-    setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('app-refresh', { detail }))
+
+    try {
+      const pending = Array.isArray(detail.promises) ? detail.promises : []
+      if (pending.length > 0) {
+        await Promise.allSettled(pending)
+      }
+    } finally {
       setIsRefreshing(false)
-    }, 1000)
+    }
   }
+
+  const autoRefreshRef = useRef(handleRefresh)
+
+  useEffect(() => {
+    autoRefreshRef.current = handleRefresh
+  }, [handleRefresh])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (typeof autoRefreshRef.current === 'function') {
+        autoRefreshRef.current()
+      }
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   const isActive = (href) => location.pathname === href
 

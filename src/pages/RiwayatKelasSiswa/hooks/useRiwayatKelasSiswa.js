@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
+import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 export function useRiwayatKelasSiswa() {
   const [data, setData] = useState([])
@@ -16,7 +17,21 @@ export function useRiwayatKelasSiswa() {
       .select(`
         *,
         siswa:id_siswa(id, nama_lengkap, nisn),
-        kelas:id_kelas(id, tingkat, nama_sub_kelas),
+        kelas:id_kelas(
+          id, 
+          tingkat, 
+          nama_sub_kelas,
+          riwayat_wali_kelas!riwayat_wali_kelas_id_kelas_fkey(
+            id,
+            status,
+            id_tahun_ajaran,
+            wali_kelas:id_wali_kelas(
+              id,
+              nama_lengkap,
+              nip
+            )
+          )
+        ),
         tahun_ajaran:id_tahun_ajaran(id, nama)
       `)
       .order('tanggal_masuk', { ascending: false })
@@ -45,6 +60,9 @@ export function useRiwayatKelasSiswa() {
     const result = await fetchData()
     setData(result)
   }, [fetchData])
+
+  const handleAppRefresh = useCallback(() => refreshData(), [refreshData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     let ignore = false
@@ -79,7 +97,21 @@ export function useRiwayatKelasSiswa() {
               .select(`
                 *,
                 siswa:id_siswa(id, nama_lengkap, nisn),
-                kelas:id_kelas(id, tingkat, nama_sub_kelas),
+                kelas:id_kelas(
+                  id, 
+                  tingkat, 
+                  nama_sub_kelas,
+                  riwayat_wali_kelas!riwayat_wali_kelas_id_kelas_fkey(
+                    id,
+                    status,
+                    id_tahun_ajaran,
+                    wali_kelas:id_wali_kelas(
+                      id,
+                      nama_lengkap,
+                      nip
+                    )
+                  )
+                ),
                 tahun_ajaran:id_tahun_ajaran(id, nama)
               `)
               .order('tanggal_masuk', { ascending: false })

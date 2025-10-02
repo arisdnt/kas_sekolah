@@ -18,6 +18,8 @@ function TagihanContent() {
     realtimeStatus,
     error,
     deleteItem,
+    kelasList,
+    tahunAjaranList,
   } = useTagihan()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -102,6 +104,8 @@ function TagihanContent() {
               selectedItem={selectedItem}
               onSelectItem={setSelectedItem}
               onViewDetail={handleOpenDetail}
+              kelasList={kelasList}
+              tahunAjaranList={tahunAjaranList}
             />
           </div>
 

@@ -110,8 +110,7 @@ function EditTagihanContent() {
       let query = supabase
         .from('jenis_pembayaran')
         .select(`
-          id, kode, nama, jumlah_default, id_tahun_ajaran, id_kelas,
-          kelas:id_kelas(tingkat),
+          id, kode, nama, jumlah_default, id_tahun_ajaran, tingkat,
           tahun_ajaran:id_tahun_ajaran(nama)
         `)
         .eq('status_aktif', true)
@@ -131,14 +130,13 @@ function EditTagihanContent() {
         query = query.eq('id_tahun_ajaran', filterTahunAjaran)
       }
 
-      const { data } = await query.order('kode')
-
-      let filteredData = data || []
-      if (filterTingkat && filteredData.length > 0) {
-        filteredData = filteredData.filter(jp => jp.kelas?.tingkat === filterTingkat)
+      if (filterTingkat) {
+        query = query.eq('tingkat', filterTingkat)
       }
 
-      setJenisPembayaranList(filteredData)
+      const { data } = await query.order('kode')
+
+      setJenisPembayaranList(data || [])
     }
     
     if (!loading && formData.id_riwayat_kelas_siswa) {

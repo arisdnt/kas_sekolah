@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
+import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 let cachedTahunAjaran = null
 
@@ -14,7 +15,12 @@ export function useTahunAjaran() {
   const fetchData = useCallback(async () => {
     const { data: result, error: queryError } = await supabase
       .from('tahun_ajaran')
-      .select('*')
+      .select(`
+        *,
+        riwayat_kelas_siswa(
+          id
+        )
+      `)
       .order('tanggal_mulai', { ascending: false })
 
     if (queryError) {
@@ -22,7 +28,12 @@ export function useTahunAjaran() {
       return []
     }
     
-    return result ?? []
+    const dataWithCount = (result ?? []).map(item => ({
+      ...item,
+      total_siswa: item.riwayat_kelas_siswa?.length || 0
+    }))
+    
+    return dataWithCount
   }, [])
 
   const applyData = useCallback((result) => {
@@ -61,6 +72,9 @@ export function useTahunAjaran() {
       }
     }
   }, [fetchData, applyData])
+
+  const handleAppRefresh = useCallback(() => refreshData(), [refreshData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     isMountedRef.current = true

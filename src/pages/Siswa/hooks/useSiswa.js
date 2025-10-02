@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
+import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 let cachedSiswa = null
 
@@ -14,7 +15,25 @@ export function useSiswa() {
   const fetchData = useCallback(async () => {
     const { data: result, error: queryError } = await supabase
       .from('siswa')
-      .select('*')
+      .select(`
+        *,
+        riwayat_kelas_siswa(
+          id,
+          status,
+          id_tahun_ajaran,
+          id_kelas,
+          tanggal_masuk,
+          kelas:id_kelas(
+            id,
+            tingkat,
+            nama_sub_kelas
+          ),
+          tahun_ajaran:id_tahun_ajaran(
+            id,
+            nama
+          )
+        )
+      `)
       .order('nama_lengkap', { ascending: true })
 
     if (queryError) {
@@ -22,7 +41,21 @@ export function useSiswa() {
       return []
     }
     
-    return result ?? []
+    const dataWithLatest = (result ?? []).map(siswa => {
+      const riwayatAktif = siswa.riwayat_kelas_siswa
+        ?.filter(r => r.status === 'aktif')
+        .sort((a, b) => new Date(b.tanggal_masuk) - new Date(a.tanggal_masuk))
+      
+      const latestRiwayat = riwayatAktif?.[0]
+      
+      return {
+        ...siswa,
+        kelas_terbaru: latestRiwayat?.kelas,
+        tahun_ajaran_terbaru: latestRiwayat?.tahun_ajaran
+      }
+    })
+    
+    return dataWithLatest
   }, [])
 
   const applyData = useCallback((result) => {
@@ -64,6 +97,9 @@ export function useSiswa() {
     },
     [fetchData, applyData],
   )
+
+  const handleAppRefresh = useCallback(() => refreshData(), [refreshData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     isMountedRef.current = true

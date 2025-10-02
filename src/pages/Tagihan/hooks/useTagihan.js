@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
+import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 export function useTagihan() {
   const [data, setData] = useState([])
@@ -31,13 +32,37 @@ export function useTagihan() {
       return []
     }
     
-    // Calculate total for each tagihan
-    const dataWithTotal = (result ?? []).map(item => ({
-      ...item,
-      total_tagihan: item.rincian_tagihan?.reduce((sum, r) => sum + parseFloat(r.jumlah || 0), 0) || 0
+    // Calculate total, dibayar, and kekurangan for each tagihan
+    const dataWithCalculations = await Promise.all((result ?? []).map(async (item) => {
+      const total_tagihan = item.rincian_tagihan?.reduce((sum, r) => sum + parseFloat(r.jumlah || 0), 0) || 0
+      
+      // Get all payment data (no status filter - all payments are considered paid)
+      const { data: pembayaranData } = await supabase
+        .from('pembayaran')
+        .select(`
+          id,
+          rincian_pembayaran(jumlah_dibayar)
+        `)
+        .eq('id_tagihan', item.id)
+      
+      // Calculate total dibayar (all payments are counted)
+      const total_dibayar = (pembayaranData ?? []).reduce((sum, p) => {
+        return sum + (p.rincian_pembayaran?.reduce((subSum, rp) => 
+          subSum + parseFloat(rp.jumlah_dibayar || 0), 0) || 0)
+      }, 0)
+      
+      // Kekurangan
+      const kekurangan = total_tagihan - total_dibayar
+      
+      return {
+        ...item,
+        total_tagihan,
+        total_dibayar,
+        kekurangan
+      }
     }))
     
-    return dataWithTotal
+    return dataWithCalculations
   }, [])
 
   const fetchRiwayatKelasSiswaList = useCallback(async () => {
@@ -75,6 +100,9 @@ export function useTagihan() {
     const result = await fetchData()
     setData(result)
   }, [fetchData])
+
+  const handleAppRefresh = useCallback(() => refreshData(), [refreshData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     let ignore = false
@@ -117,11 +145,32 @@ export function useTagihan() {
               .order('tanggal_tagihan', { ascending: false })
 
             if (!ignore && refreshedData) {
-              const dataWithTotal = refreshedData.map(item => ({
-                ...item,
-                total_tagihan: item.rincian_tagihan?.reduce((sum, r) => sum + parseFloat(r.jumlah || 0), 0) || 0
+              const dataWithCalculations = await Promise.all(refreshedData.map(async (item) => {
+                const total_tagihan = item.rincian_tagihan?.reduce((sum, r) => sum + parseFloat(r.jumlah || 0), 0) || 0
+                
+                const { data: pembayaranData } = await supabase
+                  .from('pembayaran')
+                  .select(`
+                    id,
+                    rincian_pembayaran(jumlah_dibayar)
+                  `)
+                  .eq('id_tagihan', item.id)
+                
+                const total_dibayar = (pembayaranData ?? []).reduce((sum, p) => {
+                  return sum + (p.rincian_pembayaran?.reduce((subSum, rp) => 
+                    subSum + parseFloat(rp.jumlah_dibayar || 0), 0) || 0)
+                }, 0)
+                
+                const kekurangan = total_tagihan - total_dibayar
+                
+                return {
+                  ...item,
+                  total_tagihan,
+                  total_dibayar,
+                  kekurangan
+                }
               }))
-              setData(dataWithTotal)
+              setData(dataWithCalculations)
             }
           }
         )

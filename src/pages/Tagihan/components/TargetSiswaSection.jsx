@@ -31,23 +31,6 @@ export function TargetSiswaSection({
 
       <div className="p-4">
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="flex items-center gap-1.5 mb-2">
-              <Text size="2" weight="medium" className="text-slate-700">
-                Target Tagihan <span className="text-red-500">*</span>
-              </Text>
-            </label>
-            <Select.Root value={targetType} onValueChange={onTargetTypeChange}>
-              <Select.Trigger style={{ borderRadius: 0 }} className="w-full border-slate-300" />
-              <Select.Content style={{ borderRadius: 0 }}>
-                <Select.Item value="siswa">Siswa Individual</Select.Item>
-                <Select.Item value="kelas">Satu Kelas</Select.Item>
-                <Select.Item value="tingkat">Satu Tingkat</Select.Item>
-                <Select.Item value="semua">Semua Siswa</Select.Item>
-              </Select.Content>
-            </Select.Root>
-          </div>
-
           {targetType !== 'siswa' && (
             <div>
               <label className="flex items-center gap-1.5 mb-2">
@@ -65,6 +48,23 @@ export function TargetSiswaSection({
               </Select.Root>
             </div>
           )}
+
+          <div>
+            <label className="flex items-center gap-1.5 mb-2">
+              <Text size="2" weight="medium" className="text-slate-700">
+                Target Tagihan <span className="text-red-500">*</span>
+              </Text>
+            </label>
+            <Select.Root value={targetType} onValueChange={onTargetTypeChange}>
+              <Select.Trigger style={{ borderRadius: 0 }} className="w-full border-slate-300" />
+              <Select.Content style={{ borderRadius: 0 }}>
+                <Select.Item value="siswa">Siswa Individual</Select.Item>
+                <Select.Item value="kelas">Satu Kelas</Select.Item>
+                <Select.Item value="tingkat">Satu Tingkat</Select.Item>
+                <Select.Item value="semua">Semua Siswa</Select.Item>
+              </Select.Content>
+            </Select.Root>
+          </div>
 
           {targetType === 'tingkat' && (
             <div>

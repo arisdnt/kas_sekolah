@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useAppRefresh } from './useAppRefresh'
 
 function getDateRange(timeRange) {
   const now = new Date()
@@ -287,6 +288,9 @@ export function useDashboardData(filters = {}) {
       setLoading(false)
     }
   }, [filters])
+
+  const handleAppRefresh = useCallback(() => fetchDashboardData(), [fetchDashboardData])
+  useAppRefresh(handleAppRefresh)
 
   useEffect(() => {
     fetchDashboardData()
