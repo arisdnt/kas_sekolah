@@ -108,32 +108,20 @@ function SiswaContent() {
           </div>
         ) : null}
 
-        {/* Layout 2 Kolom: 75% Tabel | 25% Detail */}
-        <div className="flex gap-3 flex-1 min-h-0">
-          {/* Kolom Kiri: Tabel (75%) */}
-          <div className="w-3/4 h-full">
-            <SiswaTable
-              data={data}
-              isLoading={loading}
-              isRefreshing={isRefreshing}
-              onEdit={handleOpenEdit}
-              onDelete={handleOpenDelete}
-              onToggleStatus={toggleStatus}
-              onAdd={handleOpenCreate}
-              selectedItem={selectedItem}
-              onSelectItem={setSelectedItem}
-              onViewDetail={handleOpenDetail}
-            />
-          </div>
-
-          {/* Kolom Kanan: Detail Panel (25%) */}
-          <div className="w-1/4 h-full">
-            <DetailPanel
-              selectedItem={selectedItem}
-              isLoading={loading}
-              isRefreshing={isRefreshing}
-            />
-          </div>
+        {/* Tabel Full Width */}
+        <div className="flex-1 min-h-0">
+          <SiswaTable
+            data={data}
+            isLoading={loading}
+            isRefreshing={isRefreshing}
+            onEdit={handleOpenEdit}
+            onDelete={handleOpenDelete}
+            onToggleStatus={toggleStatus}
+            onAdd={handleOpenCreate}
+            selectedItem={selectedItem}
+            onSelectItem={setSelectedItem}
+            onViewDetail={handleOpenDetail}
+          />
         </div>
       </div>
 

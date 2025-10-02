@@ -25,6 +25,16 @@ function formatDate(dateStr) {
   })
 }
 
+function formatCurrency(amount) {
+  if (!amount) return 'Rp 0'
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
+
 export function SiswaTable({
   data,
   isLoading = false,
@@ -202,15 +212,18 @@ export function SiswaTable({
           <div className="h-full overflow-auto excel-scrollbar">
             <table className="min-w-full table-fixed text-sm border-collapse">
               <colgroup>{[
-                <col key="col-1" style={{ width: '20%' }} />,
-                <col key="col-2" style={{ width: '12%' }} />,
-                <col key="col-3" style={{ width: '10%' }} />,
-                <col key="col-4" style={{ width: '13%' }} />,
-                <col key="col-5" style={{ width: '10%' }} />,
-                <col key="col-6" style={{ width: '10%' }} />,
+                <col key="col-1" style={{ width: '15%' }} />,
+                <col key="col-2" style={{ width: '10%' }} />,
+                <col key="col-3" style={{ width: '8%' }} />,
+                <col key="col-4" style={{ width: '10%' }} />,
+                <col key="col-5" style={{ width: '8%' }} />,
+                <col key="col-6" style={{ width: '8%' }} />,
                 <col key="col-7" style={{ width: '10%' }} />,
-                <col key="col-8" style={{ width: '10%' }} />,
-                <col key="col-9" style={{ width: '5%' }} />,
+                <col key="col-8" style={{ width: '9%' }} />,
+                <col key="col-9" style={{ width: '9%' }} />,
+                <col key="col-10" style={{ width: '8%' }} />,
+                <col key="col-11" style={{ width: '8%' }} />,
+                <col key="col-12" style={{ width: '5%' }} />,
               ]}</colgroup>
               <thead>
                 {/* Excel-style header with freeze pane effect */}
@@ -234,6 +247,15 @@ export function SiswaTable({
                   </th>
                   <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Tahun Ajaran
+                  </th>
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
+                    Total Tagihan
+                  </th>
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
+                    Total Dibayar
+                  </th>
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
+                    Tunggakan
                   </th>
                   <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">
                     Status
@@ -270,6 +292,15 @@ export function SiswaTable({
                         </td>
                         <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-4 w-32 bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3 border-r border-slate-200">
+                          <div className="h-4 w-28 bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3 border-r border-slate-200">
+                          <div className="h-4 w-28 bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3 border-r border-slate-200">
+                          <div className="h-4 w-28 bg-slate-200" />
                         </td>
                         <td className="px-4 py-3 border-r border-slate-200">
                           <div className="h-6 w-24 bg-slate-200" />
@@ -327,6 +358,21 @@ export function SiswaTable({
                     <td className="px-4 py-3 border-r border-slate-200">
                       <Text size="2" className="text-slate-700 font-sans">
                         {item.tahun_ajaran_terbaru?.nama || '—'}
+                      </Text>
+                    </td>
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" weight="bold" className="text-slate-900 font-mono">
+                        {formatCurrency(item.total_tagihan || 0)}
+                      </Text>
+                    </td>
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" weight="bold" className="text-green-700 font-mono">
+                        {formatCurrency(item.total_dibayar || 0)}
+                      </Text>
+                    </td>
+                    <td className="px-4 py-3 border-r border-slate-200">
+                      <Text size="2" weight="bold" className={item.total_tunggakan > 0 ? "text-red-600 font-mono" : "text-green-600 font-mono"}>
+                        {formatCurrency(item.total_tunggakan || 0)}
                       </Text>
                     </td>
                     <td className="px-4 py-3 border-r border-slate-200">
@@ -401,7 +447,7 @@ export function SiswaTable({
                   ))}
                 {isEmpty ? (
                   <tr>
-                    <td colSpan={9} className="relative border-r-0">
+                    <td colSpan={12} className="relative border-r-0">
                       <div className="flex flex-col items-center justify-center py-20 text-center text-slate-400 bg-slate-50">
                         {hasActiveFilters ? (
                           <>

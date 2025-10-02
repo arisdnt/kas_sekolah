@@ -4,6 +4,31 @@ import { useAppRefresh } from '../../../hooks/useAppRefresh'
 
 let cachedSiswa = null
 
+function calculateTagihanSummary(tagihanList = []) {
+  return tagihanList.reduce(
+    (acc, tagihan) => {
+      const totalTagihan = tagihan.rincian_tagihan?.reduce((sum, item) => sum + Number(item.jumlah || 0), 0) || 0
+
+      const totalDibayar = tagihan.pembayaran?.reduce((sumPembayaran, pembayaran) => {
+        const paid = pembayaran.rincian_pembayaran?.reduce(
+          (subTotal, rincian) => subTotal + Number(rincian.jumlah_dibayar || 0),
+          0,
+        ) || 0
+        return sumPembayaran + paid
+      }, 0) || 0
+
+      const kekurangan = Math.max(totalTagihan - totalDibayar, 0)
+
+      return {
+        totalTagihan: acc.totalTagihan + totalTagihan,
+        totalDibayar: acc.totalDibayar + totalDibayar,
+        totalTunggakan: acc.totalTunggakan + kekurangan,
+      }
+    },
+    { totalTagihan: 0, totalDibayar: 0, totalTunggakan: 0 },
+  )
+}
+
 export function useSiswa() {
   const [data, setData] = useState(() => cachedSiswa ?? [])
   const [loading, setLoading] = useState(() => !cachedSiswa)
@@ -31,6 +56,16 @@ export function useSiswa() {
           tahun_ajaran:id_tahun_ajaran(
             id,
             nama
+          ),
+          tagihan(
+            id,
+            nomor_tagihan,
+            tanggal_tagihan,
+            rincian_tagihan(jumlah),
+            pembayaran(
+              id,
+              rincian_pembayaran(jumlah_dibayar)
+            )
           )
         )
       `)
@@ -40,21 +75,28 @@ export function useSiswa() {
       setError('Gagal memuat data siswa: ' + queryError.message)
       return []
     }
-    
+
     const dataWithLatest = (result ?? []).map(siswa => {
       const riwayatAktif = siswa.riwayat_kelas_siswa
         ?.filter(r => r.status === 'aktif')
         .sort((a, b) => new Date(b.tanggal_masuk) - new Date(a.tanggal_masuk))
-      
+
       const latestRiwayat = riwayatAktif?.[0]
-      
+
+      // Calculate total tagihan, pembayaran, dan tunggakan dari semua riwayat
+      const allTagihan = siswa.riwayat_kelas_siswa?.flatMap(r => r.tagihan || []) || []
+      const { totalTagihan, totalDibayar, totalTunggakan } = calculateTagihanSummary(allTagihan)
+
       return {
         ...siswa,
         kelas_terbaru: latestRiwayat?.kelas,
-        tahun_ajaran_terbaru: latestRiwayat?.tahun_ajaran
+        tahun_ajaran_terbaru: latestRiwayat?.tahun_ajaran,
+        total_tagihan: totalTagihan,
+        total_dibayar: totalDibayar,
+        total_tunggakan: totalTunggakan
       }
     })
-    
+
     return dataWithLatest
   }, [])
 
