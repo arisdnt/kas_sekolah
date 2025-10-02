@@ -14,30 +14,41 @@ import {
   GearIcon,
   BellIcon,
   HamburgerMenuIcon,
-  HomeIcon,
-  BarChartIcon,
-  FileTextIcon,
+  ChevronDownIcon,
 } from '@radix-ui/react-icons'
-import { User, UserCircle } from 'lucide-react'
+import { User, UserCircle, GraduationCap, Wallet } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
-import { useSidebar } from '../contexts/SidebarContext'
+import { menuSections } from '../config/menuData'
+
+// Icon mapping untuk setiap section
+const sectionIcons = {
+  'Akademik': GraduationCap,
+  'Keuangan': Wallet,
+}
+
+// Warna icon untuk setiap section
+const sectionIconColors = {
+  'Utama': 'text-blue-300',
+  'Akademik': 'text-green-300',
+  'Keuangan': 'text-amber-300',
+}
 
 export function Navbar({ realtimeStatus = 'disconnected' }) {
   const { user } = useAuth()
-  const { isCollapsed } = useSidebar()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   async function handleLogout() {
     await supabase.auth.signOut()
   }
 
+  const isActive = (href) => location.pathname === href
+
   return (
     <nav
-      className="fixed top-0 z-30 bg-gradient-to-r from-[#476EAE] to-[#5A7FC7] shadow-lg transition-all duration-300"
-      style={{
-        left: isCollapsed ? '64px' : '256px',
-        width: isCollapsed ? 'calc(100vw - 64px)' : 'calc(100vw - 256px)'
-      }}
+      className="fixed top-0 left-0 right-0 z-30 bg-gradient-to-r from-[#476EAE] to-[#5A7FC7] shadow-lg"
     >
       <div className="px-6">
         <div className="flex h-12 items-center justify-between">
@@ -61,37 +72,84 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
               </div>
             </div>
 
-            {/* Navigation Items */}
-            <div className="hidden md:flex items-center space-x-1">
-              <Tooltip content="Dashboard">
-                <IconButton
-                  variant="ghost"
-                  size="2"
-                  className="text-white/80 hover:text-white hover:bg-white/10"
-                >
-                  <HomeIcon />
-                </IconButton>
-              </Tooltip>
+            {/* Navigation Menu Dropdowns */}
+            <div className="hidden md:flex items-center gap-4">
+              {menuSections.map((section, index) => {
+                // Single item sections (like Dashboard) render as button
+                if (section.items.length === 1) {
+                  const item = section.items[0]
+                  const Icon = item.icon
+                  const active = isActive(item.href)
+                  const iconColor = sectionIconColors[section.title] || 'text-white'
+                  
+                  return (
+                    <div key={section.title} className="flex items-center gap-4">
+                      <Button
+                        variant="ghost"
+                        size="2"
+                        onClick={() => navigate(item.href)}
+                        className={`text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer font-medium ${
+                          active ? 'bg-white/20 text-white' : ''
+                        }`}
+                      >
+                        <Icon className={`h-4 w-4 ${iconColor}`} />
+                        {item.label}
+                      </Button>
+                      {index < menuSections.length - 1 && (
+                        <Separator orientation="vertical" size="1" className="h-6 bg-white/20" />
+                      )}
+                    </div>
+                  )
+                }
 
-              <Tooltip content="Analytics">
-                <IconButton
-                  variant="ghost"
-                  size="2"
-                  className="text-white/80 hover:text-white hover:bg-white/10"
-                >
-                  <BarChartIcon />
-                </IconButton>
-              </Tooltip>
+                // Multiple items render as dropdown
+                const SectionIcon = sectionIcons[section.title]
+                const iconColor = sectionIconColors[section.title] || 'text-white'
+                
+                return (
+                  <div key={section.title} className="flex items-center gap-4">
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger>
+                        <Button
+                          variant="ghost"
+                          size="2"
+                          className="text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer font-medium"
+                        >
+                          {SectionIcon && <SectionIcon className={`h-4 w-4 ${iconColor}`} />}
+                          {section.title}
+                          <ChevronDownIcon className="h-4 w-4 ml-1" />
+                        </Button>
+                      </DropdownMenu.Trigger>
 
-              <Tooltip content="Reports">
-                <IconButton
-                  variant="ghost"
-                  size="2"
-                  className="text-white/80 hover:text-white hover:bg-white/10"
-                >
-                  <FileTextIcon />
-                </IconButton>
-              </Tooltip>
+                      <DropdownMenu.Content 
+                        className="min-w-[200px] mt-1 p-1 bg-white border border-slate-200 shadow-lg" 
+                        style={{ borderRadius: 0 }}
+                      >
+                        {section.items.map((item) => {
+                          const Icon = item.icon
+                          const active = isActive(item.href)
+                          
+                          return (
+                            <DropdownMenu.Item
+                              key={item.href}
+                              onClick={() => navigate(item.href)}
+                              className={`flex items-center gap-3 px-3 py-2 cursor-pointer ${
+                                active ? 'bg-blue-50' : ''
+                              }`}
+                            >
+                              <Icon className={`h-4 w-4 ${iconColor}`} />
+                              <span>{item.label}</span>
+                            </DropdownMenu.Item>
+                          )
+                        })}
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Root>
+                    {index < menuSections.length - 1 && (
+                      <Separator orientation="vertical" size="1" className="h-6 bg-white/20" />
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
 
@@ -156,14 +214,12 @@ export function Navbar({ realtimeStatus = 'disconnected' }) {
 
                 <DropdownMenu.Separator />
 
-                <DropdownMenu.Item className="flex items-center space-x-2 p-2">
-                  <User className="h-4 w-4" />
-                  <span>Profile</span>
-                </DropdownMenu.Item>
-
-                <DropdownMenu.Item className="flex items-center space-x-2 p-2">
+                <DropdownMenu.Item 
+                  className="flex items-center space-x-2 p-2 cursor-pointer"
+                  onClick={() => navigate('/pengaturan')}
+                >
                   <GearIcon className="h-4 w-4" />
-                  <span>Settings</span>
+                  <span>Pengaturan</span>
                 </DropdownMenu.Item>
 
                 <DropdownMenu.Separator />
