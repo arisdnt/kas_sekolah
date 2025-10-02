@@ -78,7 +78,10 @@ export function TagihanPembayaranSection({ tagihanData }) {
         nominalJenis: 0,
         nominalBayar: 0,
         saldo: 0,
-        tagihanId: tagihan.id
+        tagihanId: tagihan.id,
+        totalTagihan: tagihan.totalTagihan,
+        totalDibayar: tagihan.totalDibayar,
+        sisaTagihan: tagihan.sisaTagihan
       })
 
       // Entry rincian tagihan
@@ -128,17 +131,47 @@ export function TagihanPembayaranSection({ tagihanData }) {
           }
         })
       }
+
+      // Entry status pembayaran
+      ledgerEntries.push({
+        type: 'status_pembayaran',
+        tanggal: tagihan.tanggal_tagihan,
+        tahunAjaran: group.tahunAjaran,
+        kelas: group.kelas,
+        namaTagihan: tagihan.judul,
+        jenisPembayaran: '',
+        deskripsi: '',
+        referensi: '',
+        metode: '',
+        nominalTagihan: 0,
+        nominalJenis: 0,
+        nominalBayar: 0,
+        saldo: 0,
+        tagihanId: tagihan.id,
+        totalTagihan: tagihan.totalTagihan,
+        totalDibayar: tagihan.totalDibayar,
+        sisaTagihan: tagihan.sisaTagihan
+      })
     })
   })
 
-  // Sort by date
-  ledgerEntries.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
+  // NO SORTING! Maintain natural order from data structure
+  // Entries already in correct order: tagihan -> rincian -> pembayaran -> status per group
 
   // Calculate running balance
   let runningBalance = 0
   ledgerEntries.forEach(entry => {
-    runningBalance += (entry.nominalTagihan + entry.nominalJenis) - entry.nominalBayar
-    entry.saldo = runningBalance
+    // Hanya hitung saldo untuk entry tagihan dan pembayaran, skip rincian dan status
+    if (entry.type === 'tagihan') {
+      runningBalance += entry.nominalTagihan
+      entry.saldo = runningBalance
+    } else if (entry.type === 'pembayaran') {
+      runningBalance -= entry.nominalBayar
+      entry.saldo = runningBalance
+    } else if (entry.type === 'status_pembayaran') {
+      entry.saldo = runningBalance
+    }
+    // rincian_tagihan tidak mengubah saldo karena sudah termasuk dalam nominalTagihan
   })
 
   return (
@@ -177,60 +210,84 @@ export function TagihanPembayaranSection({ tagihanData }) {
             </tr>
           </thead>
           <tbody>
-            {ledgerEntries.map((entry, index) => (
-              <tr
-                key={index}
-                className={`border-b border-slate-200 ${
-                  entry.type === 'tagihan' ? 'bg-blue-50' :
-                  entry.type === 'pembayaran' ? 'bg-green-50' :
-                  'bg-white'
-                }`}
-              >
-                <td className="px-3 py-2 text-slate-700 border-r border-slate-200 whitespace-nowrap">
-                  {entry.type === 'rincian_tagihan' ? '' : formatDate(entry.tanggal)}
-                </td>
-                <td className="px-3 py-2 text-slate-700 border-r border-slate-200">
-                  {entry.type === 'rincian_tagihan' ? '' : `${entry.tahunAjaran} / Kelas ${entry.kelas}`}
-                </td>
-                <td className={`py-2 border-r border-slate-200 ${
-                  entry.type === 'tagihan' ? 'font-bold text-slate-900 px-3' :
-                  entry.type === 'pembayaran' ? 'font-medium text-slate-900 px-3' :
-                  'font-medium text-indigo-700 pl-8 pr-3'
-                }`}>
-                  {entry.type === 'tagihan' ? entry.namaTagihan :
-                   entry.type === 'pembayaran' ? entry.namaTagihan :
-                   `↳ ${entry.jenisPembayaran}`}
-                </td>
-                <td className="px-3 py-2 text-slate-600 border-r border-slate-200 text-xs">
-                  {entry.deskripsi || '-'}
-                </td>
-                <td className="px-3 py-2 text-slate-700 font-mono border-r border-slate-200 text-xs">
-                  {entry.referensi || '-'}
-                </td>
-                <td className="px-3 py-2 text-slate-700 border-r border-slate-200 text-xs">
-                  {entry.metode || '-'}
-                </td>
-                <td className={`py-2 border-r border-slate-200 text-right ${
-                  entry.type === 'tagihan' ? 'font-mono text-blue-700 font-bold pr-12 pl-3' :
-                  entry.type === 'rincian_tagihan' ? 'font-mono text-indigo-700 pr-3 pl-3' :
-                  'pl-3 pr-3'
-                }`}>
-                  {entry.type === 'tagihan' && entry.nominalTagihan > 0 && formatCurrency(entry.nominalTagihan)}
-                  {entry.type === 'rincian_tagihan' && entry.nominalJenis > 0 && `↳ ${formatCurrency(entry.nominalJenis)}`}
-                </td>
-                <td className="px-3 py-2 text-right border-r border-slate-200">
-                  {entry.nominalBayar > 0 && (
-                    <span className="text-green-700 font-mono">{formatCurrency(entry.nominalBayar)}</span>
-                  )}
-                </td>
-                <td className={`px-3 py-2 text-right font-mono font-bold ${
-                  entry.type === 'rincian_tagihan' ? '' :
-                  entry.saldo > 0 ? 'text-red-700' : entry.saldo < 0 ? 'text-green-700' : 'text-slate-700'
-                }`}>
-                  {entry.type === 'rincian_tagihan' ? '' : formatCurrency(Math.abs(entry.saldo))}
-                </td>
-              </tr>
-            ))}
+            {ledgerEntries.map((entry, index) => {
+              if (entry.type === 'status_pembayaran') {
+                const statusText = entry.sisaTagihan <= 0 ? 'LUNAS' :
+                                   entry.sisaTagihan > 0 ? `KURANG BAYAR ${formatCurrency(entry.sisaTagihan)}` : ''
+                const statusColor = entry.sisaTagihan <= 0 ? 'bg-green-100 border-green-300 text-green-800' :
+                                    'bg-red-100 border-red-300 text-red-800'
+
+                return (
+                  <tr key={index} className={`border-y-2 border-slate-400 ${statusColor}`}>
+                    <td colSpan="9" className="px-4 py-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold">
+                          Status Pembayaran untuk tagihan "{entry.namaTagihan}"
+                        </span>
+                        <span className="font-bold">
+                          {statusText}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              }
+
+              return (
+                <tr
+                  key={index}
+                  className={`border-b border-slate-200 ${
+                    entry.type === 'tagihan' ? 'bg-blue-50' :
+                    entry.type === 'pembayaran' ? 'bg-green-50' :
+                    'bg-white'
+                  }`}
+                >
+                  <td className="px-3 py-2 text-slate-700 border-r border-slate-200 whitespace-nowrap">
+                    {entry.type === 'rincian_tagihan' ? '' : formatDate(entry.tanggal)}
+                  </td>
+                  <td className="px-3 py-2 text-slate-700 border-r border-slate-200">
+                    {entry.type === 'rincian_tagihan' ? '' : `${entry.tahunAjaran} / Kelas ${entry.kelas}`}
+                  </td>
+                  <td className={`py-2 border-r border-slate-200 ${
+                    entry.type === 'tagihan' ? 'font-bold text-slate-900 px-3' :
+                    entry.type === 'pembayaran' ? 'font-medium text-slate-900 px-3' :
+                    'font-medium text-indigo-700 pl-8 pr-3'
+                  }`}>
+                    {entry.type === 'tagihan' ? entry.namaTagihan :
+                     entry.type === 'pembayaran' ? entry.namaTagihan :
+                     `↳ ${entry.jenisPembayaran}`}
+                  </td>
+                  <td className="px-3 py-2 text-slate-600 border-r border-slate-200 text-xs">
+                    {entry.deskripsi || '-'}
+                  </td>
+                  <td className="px-3 py-2 text-slate-700 font-mono border-r border-slate-200 text-xs">
+                    {entry.referensi || '-'}
+                  </td>
+                  <td className="px-3 py-2 text-slate-700 border-r border-slate-200 text-xs">
+                    {entry.metode || '-'}
+                  </td>
+                  <td className={`py-2 border-r border-slate-200 text-right ${
+                    entry.type === 'tagihan' ? 'font-mono text-blue-700 font-bold pr-12 pl-3' :
+                    entry.type === 'rincian_tagihan' ? 'font-mono text-indigo-700 pr-3 pl-3' :
+                    'pl-3 pr-3'
+                  }`}>
+                    {entry.type === 'tagihan' && entry.nominalTagihan > 0 && formatCurrency(entry.nominalTagihan)}
+                    {entry.type === 'rincian_tagihan' && entry.nominalJenis > 0 && `↳ ${formatCurrency(entry.nominalJenis)}`}
+                  </td>
+                  <td className="px-3 py-2 text-right border-r border-slate-200">
+                    {entry.nominalBayar > 0 && (
+                      <span className="text-green-700 font-mono">{formatCurrency(entry.nominalBayar)}</span>
+                    )}
+                  </td>
+                  <td className={`px-3 py-2 text-right font-mono font-bold ${
+                    entry.type === 'rincian_tagihan' ? '' :
+                    entry.saldo > 0 ? 'text-red-700' : entry.saldo < 0 ? 'text-green-700' : 'text-slate-700'
+                  }`}>
+                    {entry.type === 'rincian_tagihan' ? '' : formatCurrency(Math.abs(entry.saldo))}
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
           <tfoot className="bg-slate-100 border-t-2 border-slate-300">
             <tr>
@@ -246,7 +303,11 @@ export function TagihanPembayaranSection({ tagihanData }) {
               <td className={`px-3 py-2 text-right font-bold font-mono ${
                 grandTotal.sisaTagihan > 0 ? 'text-red-700' : grandTotal.sisaTagihan < 0 ? 'text-green-700' : 'text-slate-700'
               }`}>
-                {formatCurrency(Math.abs(grandTotal.sisaTagihan))}
+                {grandTotal.sisaTagihan > 0 ? (
+                  <span><span className="text-xl">-</span> {formatCurrency(Math.abs(grandTotal.sisaTagihan))}</span>
+                ) : (
+                  formatCurrency(Math.abs(grandTotal.sisaTagihan))
+                )}
               </td>
             </tr>
           </tfoot>

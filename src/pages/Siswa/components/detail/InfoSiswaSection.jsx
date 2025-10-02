@@ -23,7 +23,8 @@ export function InfoSiswaSection({ siswa }) {
         </div>
       </div>
 
-      <div className="p-4">
+      <div className="p-4 grid grid-cols-2 gap-x-8">
+        {/* Kolom Kiri */}
         <table className="w-full text-sm">
           <tbody>
             <tr className="border-b border-slate-200">
@@ -34,14 +35,20 @@ export function InfoSiswaSection({ siswa }) {
               <td className="py-2 pr-4 text-slate-600 font-medium">NISN</td>
               <td className="py-2 text-slate-900 font-mono">{siswa.nisn || '-'}</td>
             </tr>
-            <tr className="border-b border-slate-200">
+            <tr>
               <td className="py-2 pr-4 text-slate-600 font-medium">Jenis Kelamin</td>
               <td className="py-2 text-slate-900">
                 {siswa.jenis_kelamin === 'L' ? 'Laki-laki' : siswa.jenis_kelamin === 'P' ? 'Perempuan' : '-'}
               </td>
             </tr>
+          </tbody>
+        </table>
+
+        {/* Kolom Kanan */}
+        <table className="w-full text-sm">
+          <tbody>
             <tr className="border-b border-slate-200">
-              <td className="py-2 pr-4 text-slate-600 font-medium">Tanggal Lahir</td>
+              <td className="py-2 pr-4 text-slate-600 font-medium w-40">Tanggal Lahir</td>
               <td className="py-2 text-slate-900">{formatDate(siswa.tanggal_lahir)}</td>
             </tr>
             <tr className="border-b border-slate-200">

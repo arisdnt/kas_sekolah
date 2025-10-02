@@ -76,45 +76,45 @@ export function DetailSiswa() {
     <PageLayout>
       <div className="h-full flex flex-col">
         {/* Header */}
-        <div className="border-b-2 border-slate-300 bg-gradient-to-b from-slate-50 to-slate-100 px-6 py-4 shrink-0">
+        <div className="shrink-0 bg-white px-2 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={() => navigate('/siswa')}
-                variant="soft"
-                color="gray"
-                style={{ borderRadius: 0 }}
-                className="cursor-pointer"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Kembali
-              </Button>
-              <div>
-                <Text size="5" weight="bold" className="text-slate-800 block">
-                  Detail Siswa
-                </Text>
-                <Text size="2" className="text-slate-600">
-                  Informasi lengkap dan riwayat siswa
-                </Text>
-              </div>
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5 text-blue-600" />
+              <Text size="4" weight="bold" className="text-slate-900">
+                Detail Siswa
+              </Text>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate('/siswa')}
+                className="flex items-center gap-2 px-4 py-2 border border-slate-300 bg-white hover:bg-slate-50 transition-colors"
+                type="button"
+              >
+                <ArrowLeft className="h-4 w-4 text-slate-600" />
+                <Text size="2" weight="medium" className="text-slate-700">
+                  Kembali
+                </Text>
+              </button>
               {siswa.status_aktif ? (
-                <Badge color="green" size="2" style={{ borderRadius: 0 }}>
-                  Aktif
-                </Badge>
+                <div className="flex items-center gap-2 px-4 py-2 bg-green-100 border border-green-300">
+                  <Text size="2" weight="medium" className="text-green-700">
+                    Status: Aktif
+                  </Text>
+                </div>
               ) : (
-                <Badge color="gray" size="2" style={{ borderRadius: 0 }}>
-                  Tidak Aktif
-                </Badge>
+                <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 border border-gray-300">
+                  <Text size="2" weight="medium" className="text-gray-700">
+                    Status: Tidak Aktif
+                  </Text>
+                </div>
               )}
             </div>
           </div>
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-auto excel-scrollbar bg-slate-50">
-          <div className="p-6 space-y-4">
+        <div className="flex-1 overflow-auto excel-scrollbar bg-white">
+          <div className="p-2 space-y-4">
             {/* Informasi Siswa */}
             <InfoSiswaSection siswa={siswa} />
 
