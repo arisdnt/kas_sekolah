@@ -3,6 +3,7 @@ import { Theme } from '@radix-ui/themes'
 import { Login } from './pages/Login'
 import { Dashboard } from './pages/Dashboard'
 import { Siswa } from './pages/Siswa/index'
+import { DetailSiswa } from './pages/Siswa/DetailSiswa'
 import { Kelas } from './pages/Kelas/index'
 import { TahunAjaran } from './pages/TahunAjaran'
 import { RiwayatKelasSiswa } from './pages/RiwayatKelasSiswa/index'
@@ -24,6 +25,7 @@ import { ProtectedShell } from './components/ProtectedShell'
 const routes = [
   { path: 'dashboard', element: <Dashboard /> },
   { path: 'siswa', element: <Siswa /> },
+  { path: 'siswa/:id', element: <DetailSiswa /> },
   { path: 'kelas', element: <Kelas /> },
   { path: 'tahun-ajaran', element: <TahunAjaran /> },
   { path: 'riwayat-kelas-siswa', element: <RiwayatKelasSiswa /> },

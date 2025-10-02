@@ -87,8 +87,8 @@ function SiswaContent() {
   }
 
   const handleOpenDetail = (item) => {
-    setSelectedItem(item)
-    setDetailModalOpen(true)
+    // Navigate to detail page instead of opening modal
+    window.location.href = `/siswa/${item.id}`
   }
 
   return (
