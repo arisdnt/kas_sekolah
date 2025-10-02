@@ -179,15 +179,15 @@ export function WaliKelasTable({
               <div className="pointer-events-none sticky top-0 z-20 h-0.5 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent animate-pulse" />
             ) : null}
             <table className="min-w-full table-fixed text-sm">
-              <colgroup>
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '18%' }} />
-                <col style={{ width: '12%' }} />
-                <col style={{ width: '10%' }} />
-                <col style={{ width: '5%' }} />
-              </colgroup>
+              <colgroup>{[
+                <col key="col-1" style={{ width: '25%' }} />,
+                <col key="col-2" style={{ width: '15%' }} />,
+                <col key="col-3" style={{ width: '15%' }} />,
+                <col key="col-4" style={{ width: '18%' }} />,
+                <col key="col-5" style={{ width: '12%' }} />,
+                <col key="col-6" style={{ width: '10%' }} />,
+                <col key="col-7" style={{ width: '5%' }} />,
+              ]}</colgroup>
               <thead>
                 <tr className="bg-gradient-to-b from-slate-100 to-slate-50 sticky top-0 z-10 border-b border-slate-300 shadow-sm">
                   <th className="px-4 py-3 text-left text-[0.7rem] font-bold uppercase tracking-wider text-slate-700 border-r border-slate-300">

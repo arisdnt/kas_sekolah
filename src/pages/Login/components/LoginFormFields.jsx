@@ -5,7 +5,7 @@ export function LoginFormFields({ email, setEmail, password, setPassword }) {
   return (
     <Flex direction="column" gap="4">
       <label>
-        <Text as="div" size="2" mb="1" weight="medium" className="text-gray-700">
+        <Text as="div" size="2" mb="1" weight="medium" className="text-slate-700">
           Email
         </Text>
         <TextField.Root
@@ -15,6 +15,7 @@ export function LoginFormFields({ email, setEmail, password, setPassword }) {
           placeholder="you@example.com"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          style={{ borderRadius: 0, border: '1px solid #cbd5e1' }}
         >
           <TextField.Slot>
             <EnvelopeClosedIcon />
@@ -23,7 +24,7 @@ export function LoginFormFields({ email, setEmail, password, setPassword }) {
       </label>
 
       <label>
-        <Text as="div" size="2" mb="1" weight="medium" className="text-gray-700">
+        <Text as="div" size="2" mb="1" weight="medium" className="text-slate-700">
           Password
         </Text>
         <TextField.Root
@@ -33,6 +34,7 @@ export function LoginFormFields({ email, setEmail, password, setPassword }) {
           placeholder="••••••••"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          style={{ borderRadius: 0, border: '1px solid #cbd5e1' }}
         >
           <TextField.Slot>
             <LockClosedIcon />

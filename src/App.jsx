@@ -9,14 +9,13 @@ import { RiwayatKelasSiswa } from './pages/RiwayatKelasSiswa/index'
 import { WaliKelas } from './pages/WaliKelas/index'
 import { RiwayatWaliKelas } from './pages/RiwayatWaliKelas/index'
 import { JenisPembayaran } from './pages/JenisPembayaran/index'
-import { CreateJenisPembayaran } from './pages/JenisPembayaran/CreateJenisPembayaran'
-import { EditJenisPembayaran } from './pages/JenisPembayaran/EditJenisPembayaran'
 import { Tagihan } from './pages/Tagihan/index'
 import { CreateTagihan } from './pages/Tagihan/CreateTagihan'
 import { EditTagihan } from './pages/Tagihan/EditTagihan'
 import { Pembayaran } from './pages/Pembayaran/index'
 import { CreatePembayaran } from './pages/Pembayaran/CreatePembayaran'
 import { EditPembayaran } from './pages/Pembayaran/EditPembayaran'
+import { DetailPembayaran } from './pages/Pembayaran/DetailPembayaran'
 import { Pengaturan } from './pages/Pengaturan'
 import { ProtectedShell } from './components/ProtectedShell'
 
@@ -29,14 +28,13 @@ const routes = [
   { path: 'wali-kelas', element: <WaliKelas /> },
   { path: 'riwayat-wali-kelas', element: <RiwayatWaliKelas /> },
   { path: 'jenis-pembayaran', element: <JenisPembayaran /> },
-  { path: 'jenis-pembayaran/create', element: <CreateJenisPembayaran /> },
-  { path: 'jenis-pembayaran/edit/:id', element: <EditJenisPembayaran /> },
   { path: 'tagihan', element: <Tagihan /> },
   { path: 'tagihan/create', element: <CreateTagihan /> },
   { path: 'tagihan/edit/:id', element: <EditTagihan /> },
   { path: 'pembayaran', element: <Pembayaran /> },
   { path: 'pembayaran/create', element: <CreatePembayaran /> },
   { path: 'pembayaran/edit/:id', element: <EditPembayaran /> },
+  { path: 'pembayaran/detail/:id', element: <DetailPembayaran /> },
   { path: 'pengaturan', element: <Pengaturan /> },
 ]
 

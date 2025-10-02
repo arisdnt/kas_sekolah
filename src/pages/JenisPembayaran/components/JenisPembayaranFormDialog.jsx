@@ -122,12 +122,16 @@ export function JenisPembayaranFormDialog({
               {isEdit ? <Edit3 className="h-5 w-5 text-white" /> : <DollarSign className="h-5 w-5 text-white" />}
             </div>
             <div>
-              <Text size="3" weight="bold" className="text-slate-800 uppercase tracking-wider">
-                {isEdit ? 'Edit Jenis Pembayaran' : 'Tambah Jenis Pembayaran'}
-              </Text>
-              <Text size="1" className="text-slate-600">
-                {isEdit ? 'Perbarui informasi jenis pembayaran' : 'Tambahkan jenis pembayaran baru'}
-              </Text>
+              <Dialog.Title asChild>
+                <Text size="3" weight="bold" className="text-slate-800 uppercase tracking-wider">
+                  {isEdit ? 'Edit Jenis Pembayaran' : 'Tambah Jenis Pembayaran'}
+                </Text>
+              </Dialog.Title>
+              <Dialog.Description asChild>
+                <Text size="1" className="text-slate-600">
+                  {isEdit ? 'Perbarui informasi jenis pembayaran' : 'Tambahkan jenis pembayaran baru'}
+                </Text>
+              </Dialog.Description>
             </div>
           </div>
           <button
@@ -287,17 +291,17 @@ export function JenisPembayaranFormDialog({
                   <BookOpen className="h-3.5 w-3.5 text-teal-500" />
                   <Text size="2" weight="medium">Kelas Spesifik (Opsional)</Text>
                 </div>
-                <Select.Root 
-                  value={formData.id_kelas} 
-                  onValueChange={(value) => setFormData({ ...formData, id_kelas: value })}
+                <Select.Root
+                  value={formData.id_kelas || undefined}
+                  onValueChange={(value) => setFormData({ ...formData, id_kelas: value === '__all__' ? '' : value })}
                   disabled={!formData.tingkat}
                 >
-                  <Select.Trigger 
-                    style={{ borderRadius: 0, width: '100%' }} 
-                    placeholder={formData.tingkat ? "Pilih kelas atau kosongkan untuk semua kelas" : "Pilih tingkat terlebih dahulu"} 
+                  <Select.Trigger
+                    style={{ borderRadius: 0, width: '100%' }}
+                    placeholder={formData.tingkat ? "Pilih kelas atau kosongkan untuk semua kelas" : "Pilih tingkat terlebih dahulu"}
                   />
                   <Select.Content style={{ borderRadius: 0 }}>
-                    <Select.Item value="">Semua Kelas (Tingkat {formData.tingkat})</Select.Item>
+                    <Select.Item value="__all__">Semua Kelas (Tingkat {formData.tingkat})</Select.Item>
                     {filteredKelasList.map((kelas) => (
                       <Select.Item key={kelas.id} value={kelas.id}>
                         Kelas {kelas.tingkat} {kelas.nama_sub_kelas}

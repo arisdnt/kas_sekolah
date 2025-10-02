@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { PageLayout } from '../../layout/PageLayout'
 import { Text } from '@radix-ui/themes'
 import { AlertCircle } from 'lucide-react'
 import { usePembayaran } from './hooks/usePembayaran'
 import { PembayaranTable } from './components/PembayaranTable'
-import { PembayaranFormDialog } from './components/PembayaranFormDialog'
-import { PembayaranDetailModal } from './components/PembayaranDetailModal'
 import { DeleteConfirmDialog } from '../../components/common/DeleteConfirmDialog'
 import { DetailPanel } from './components/DetailPanel'
 
 function PembayaranContent() {
+  const navigate = useNavigate()
   const {
     data,
     loading,
@@ -20,10 +20,7 @@ function PembayaranContent() {
     isRefreshing,
   } = usePembayaran()
 
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [detailModalOpen, setDetailModalOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [editMode, setEditMode] = useState(false)
   const [currentItem, setCurrentItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
 
@@ -35,20 +32,18 @@ function PembayaranContent() {
   }, [data, selectedItem])
 
   const handleOpenCreate = () => {
-    setEditMode(false)
-    setCurrentItem(null)
-    setDialogOpen(true)
+    // Navigate to create page
+    navigate('/pembayaran/create')
   }
 
   const handleOpenEdit = (item) => {
-    setEditMode(true)
-    setCurrentItem(item)
-    setDialogOpen(true)
+    // Navigate to edit page
+    navigate(`/pembayaran/edit/${item.id}`)
   }
 
   const handleOpenDetail = (item) => {
-    setCurrentItem(item)
-    setDetailModalOpen(true)
+    // Navigate to detail page
+    navigate(`/pembayaran/detail/${item.id}`)
   }
 
   const handleOpenDelete = (item) => {
@@ -111,14 +106,6 @@ function PembayaranContent() {
         </div>
       </div>
 
-      <PembayaranFormDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onSubmit={saveItem}
-        initialData={currentItem}
-        isEdit={editMode}
-      />
-
       <DeleteConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -126,12 +113,6 @@ function PembayaranContent() {
         itemName={currentItem?.nomor_pembayaran || ''}
         title="Hapus Pembayaran"
         description="Apakah Anda yakin ingin menghapus pembayaran"
-      />
-
-      <PembayaranDetailModal
-        open={detailModalOpen}
-        onOpenChange={setDetailModalOpen}
-        pembayaran={currentItem}
       />
       </PageLayout>
   )

@@ -199,14 +199,14 @@ export function TahunAjaranTable({
         <div className="relative flex-1 min-h-0">
           <div className="h-full overflow-auto excel-scrollbar">
             <table className="min-w-full table-fixed text-sm border-collapse">
-              <colgroup>
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '13%' }} />
-                <col style={{ width: '14%' }} />
-                <col style={{ width: '8%' }} />
-              </colgroup>
+              <colgroup>{[
+                <col key="col-1" style={{ width: '25%' }} />,
+                <col key="col-2" style={{ width: '20%' }} />,
+                <col key="col-3" style={{ width: '20%' }} />,
+                <col key="col-4" style={{ width: '13%' }} />,
+                <col key="col-5" style={{ width: '14%' }} />,
+                <col key="col-6" style={{ width: '8%' }} />,
+              ]}</colgroup>
               <thead>
                 {/* Excel-style header with freeze pane effect */}
                 <tr className="bg-gradient-to-b from-slate-100 to-slate-50 sticky top-0 z-10 border-b border-slate-300 shadow-sm">

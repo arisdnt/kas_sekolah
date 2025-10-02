@@ -201,15 +201,15 @@ export function SiswaTable({
         <div className="relative flex-1 min-h-0">
           <div className="h-full overflow-auto excel-scrollbar">
             <table className="min-w-full table-fixed text-sm border-collapse">
-              <colgroup>
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '12%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '12%' }} />
-                <col style={{ width: '13%' }} />
-                <col style={{ width: '8%' }} />
-              </colgroup>
+              <colgroup>{[
+                <col key="col-1" style={{ width: '25%' }} />,
+                <col key="col-2" style={{ width: '15%' }} />,
+                <col key="col-3" style={{ width: '12%' }} />,
+                <col key="col-4" style={{ width: '15%' }} />,
+                <col key="col-5" style={{ width: '12%' }} />,
+                <col key="col-6" style={{ width: '13%' }} />,
+                <col key="col-7" style={{ width: '8%' }} />,
+              ]}</colgroup>
               <thead>
                 {/* Excel-style header with freeze pane effect */}
                 <tr className="bg-gradient-to-b from-slate-100 to-slate-50 sticky top-0 z-10 border-b border-slate-300 shadow-sm">

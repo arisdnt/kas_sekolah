@@ -17,10 +17,10 @@ export function LoginForm({
       <div className="w-full max-w-sm">
         <Flex direction="column" gap="6">
           <div className="text-center mb-2">
-            <Heading size="6" className="text-gray-900 mb-2">
+            <Heading size="6" className="text-slate-900 mb-2">
               Masuk ke Sistem
             </Heading>
-            <Text size="3" color="gray">
+            <Text size="3" className="text-slate-600">
               Gunakan kredensial Anda untuk mengakses dashboard
             </Text>
           </div>

@@ -8,6 +8,12 @@ export function JenisPembayaranTable({ data, isLoading, isRefreshing, onEdit, on
   const filters = useJenisPembayaranFilters(data)
   const isEmpty = filters.filteredData.length === 0
 
+  const stats = {
+    total: data.length,
+    active: data.filter(item => item.status_aktif).length,
+    filtered: filters.filteredData.length,
+  }
+
   return (
     <div className="h-full flex flex-col">
       <div className="h-full flex flex-col border border-slate-300 bg-white shadow-lg relative">
@@ -30,22 +36,23 @@ export function JenisPembayaranTable({ data, isLoading, isRefreshing, onEdit, on
           hasActiveFilters={filters.hasActiveFilters}
           handleClearFilters={filters.handleClearFilters}
           onAdd={onAdd}
+          stats={stats}
         />
 
         <div className="relative flex-1 min-h-0">
           <div className="h-full overflow-auto">
             <table className="min-w-full table-fixed text-sm">
-              <colgroup>
-                <col style={{ width: '10%' }} /> {/* Kode */}
-                <col style={{ width: '18%' }} /> {/* Nama */}
-                <col style={{ width: '12%' }} /> {/* Jumlah Default */}
-                <col style={{ width: '10%' }} /> {/* Tipe */}
-                <col style={{ width: '14%' }} /> {/* Tahun Ajaran */}
-                <col style={{ width: '14%' }} /> {/* Kelas */}
-                <col style={{ width: '8%' }} />  {/* Wajib */}
-                <col style={{ width: '8%' }} />  {/* Status */}
-                <col style={{ width: '6%' }} />  {/* Aksi */}
-              </colgroup>
+              <colgroup>{[
+                <col key="kode" style={{ width: '10%' }} />,
+                <col key="nama" style={{ width: '18%' }} />,
+                <col key="jumlah-default" style={{ width: '12%' }} />,
+                <col key="tipe" style={{ width: '10%' }} />,
+                <col key="tahun-ajaran" style={{ width: '14%' }} />,
+                <col key="kelas" style={{ width: '14%' }} />,
+                <col key="wajib" style={{ width: '8%' }} />,
+                <col key="status" style={{ width: '8%' }} />,
+                <col key="aksi" style={{ width: '6%' }} />,
+              ]}</colgroup>
               <JenisPembayaranTableHeader />
               <tbody className="divide-y divide-slate-100">
                 {filters.filteredData.map((item) => (
